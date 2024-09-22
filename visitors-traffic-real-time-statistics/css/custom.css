@@ -1,0 +1,91 @@
+.swal2-container {display: contents !important; }
+
+.add{
+  display: none !important; 
+}
+.googlePlay{
+  animation: translate 3s infinite;
+}
+@keyframes translate {
+  0%{
+    transform: translateX(0px);
+  }
+  50%{
+    transform: translateX(-8px);
+  }
+  100%{
+    transform: translateX(0px);
+  }
+}
+
+@media (max-width: 800px) {
+    .add{
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        background:  #6747f5 ;
+        border-radius: 3px;
+        color: #fff;
+        box-shadow: rgba(33, 35, 38, 0.4) 0px 10px 10px -10px;
+     
+    }
+    .add p {
+        margin: 0!important;
+    }
+  }
+  .panelcontent{
+      border-radius: 7px;
+  }
+  .box_widget{
+    border: 0px !important;
+    border-radius: 7px !important;
+    box-shadow: 0 4px 25px 0 rgb(168 180 208 / 10%) !important;
+   margin-bottom: 8px;
+  }
+  .panel .box-heading{
+    border-radius: 7px 7px 0 0 !important;
+  }
+  thead{
+    background-color: #F5F5F5	;
+  }
+  thead th {
+    padding: 13px 10px !important;
+   
+  }
+  thead th:first-child{
+    border-radius: 4px 0 0 4px !important;
+  }
+  thead th:last-child{
+    border-radius: 0 4px 4px 0 !important;
+  }
+  
+  input[type="text"] , textarea , .wp-core-ui select{
+    background-color: #F5F5F5 !important	;
+    border: 1px solid #ffffff  !important;
+    transition: .3s all;
+    border-radius: 4px !important;
+  }
+   input[type="text"] , .wp-core-ui select , .ss-multi-selected{
+    height: 38px !important;
+  width: 25%;min-width: 200px;}
+  .wp-core-ui select:hover ,.wp-core-ui select:focus ,input[type="text"]:hover ,input[type="text"]:focus , textarea:hover , textarea:focus {
+    background-color: #ebebeb !important	;
+    color: #2c3338;
+    border: 1px solid #c7c7c7  !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+  .ss-main .ss-multi-selected .ss-add {
+    margin: 13px 12px 0 5px;
+}
+.grid-Qr {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 600px) {
+  .grid-Qr {
+      grid-template-columns: 1fr;
+  }
+}
