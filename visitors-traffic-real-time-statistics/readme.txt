@@ -2,8 +2,8 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 6.5.5
-Stable tag: 7.6
+Tested up to: 6.7.1
+Stable tag: 7.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -176,6 +176,12 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 7.7 =
+
+1. Bug fixing in the browser statistics
+2. Bug fixing in the timezone settings
+2. Wordpress 6.7.1 support
 
 = 7.6 =
 

@@ -73,9 +73,8 @@ $ahcfree_get_save_settings = ahcfree_get_save_settings();
 $hits_days = $ahcfree_get_save_settings[0]->set_hits_days;
 $ajax_check = ($ahcfree_get_save_settings[0]->set_ajax_check * 1000);
 $set_ips = $ahcfree_get_save_settings[0]->set_ips;
-if($set_ips !='')
-{
-$set_ips = str_ireplace(' ', '&#10;', $set_ips);
+if ($set_ips != '') {
+	$set_ips = str_ireplace(' ', '&#10;', $set_ips);
 }
 
 $delete_plugin_data = get_option('ahcfree_delete_plugin_data_on_uninstall');
@@ -109,23 +108,24 @@ $ahcproRobots = get_option('ahcproRobots');
 						<label for="exampleFormControlSelect1">Select Timezone</label>
 
 						<select class="form-control" id="set_custom_timezone" name="set_custom_timezone">
-
 							<?php
-
 							$wp_timezone_string = get_option('timezone_string');
-							$custom_timezone_offset = (get_option('ahcfree_custom_timezone') != '') ?  get_option('ahcfree_custom_timezone') : $wp_timezone_string;
+							$custom_timezone_offset = (get_option('ahcfree_custom_timezone') != '') ? get_option('ahcfree_custom_timezone') : $wp_timezone_string;
 							$timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
 							foreach ($timezones as $key => $value) {
 							?>
-								<option value="<?php echo esc_attr($value); ?>" <?php echo ($value == $custom_timezone_offset) ? 'selected' : ''; ?>><?php echo esc_html($value); ?></option>
+								<option value="<?php echo esc_attr($value); ?>" <?php echo ($value == $custom_timezone_offset) ? 'selected' : ''; ?>>
+									<?php echo esc_html($value); ?>
+								</option>
 							<?php
 							}
 							?>
 						</select>
 					</div>
 					<div class="form-group col-md-4">
-						<br><span style="color:red; font-size:13px; ">Please select the same timezone in your</span> <a style="font-size:13px; " href="options-general.php" target="_blank">general settings page</a>
+						<br><span style="color:green; font-size:13px;">The timezone displayed here is fetched from the general settings.</span>
 					</div>
+
 
 				</div>
 
@@ -145,9 +145,9 @@ $ahcproRobots = get_option('ahcproRobots');
 						<label for="exampleInput">IP's to exclude</label>
 						<textarea placeholder='192.168.1.1&#10;192.168.1.2' name="set_ips" id="set_ips" rows="3" class="form-control"><?php echo  esc_html($set_ips); ?></textarea>
 						<small id="Help" class="form-text text-muted">Excluded IPs will not be tracked by your counter, enter IP per line</small>
-					
-				<br />
-				<label for='exampleInput'>User Role Exclusion From Statistics</label><br>
+
+						<br />
+						<label for='exampleInput'>User Role Exclusion From Statistics</label><br>
 						<?php
 						$html = '';
 
@@ -164,7 +164,7 @@ $ahcproRobots = get_option('ahcproRobots');
 
 						}
 
-						
+
 						$UserRoles = get_option('ahcproExcludeRoles');
 
 						$UserRoles_arr = explode(',', $UserRoles);
@@ -173,7 +173,7 @@ $ahcproRobots = get_option('ahcproRobots');
 							<?php
 							foreach ($available_roles_capable as $role) {
 								$translated_role_name = $role;
-								if (in_array($translated_role_name, $UserRoles_arr) ) {
+								if (in_array($translated_role_name, $UserRoles_arr)) {
 									$selected_value = 'selected=selected';
 								} else {
 									$selected_value = '';
@@ -195,10 +195,10 @@ $ahcproRobots = get_option('ahcproRobots');
 								})
 							});
 						</script>
-					
+
 					</div>
-					
-					
+
+
 
 				</div>
 
@@ -287,7 +287,7 @@ $ahcproRobots = get_option('ahcproRobots');
 
 
 				</div>
-				
+
 				<input type="submit" name="save" value="save settings" style=" background-color: #4CAF50; /* Green */
   border: none;
   color: white;
@@ -297,7 +297,7 @@ $ahcproRobots = get_option('ahcproRobots');
   display: inline-block;
   font-size: 16px;
   border-radius:4px" />
-		<input type="button" name="cancel" value="back to dashboard" onclick="javascript:window.location.href = 'admin.php?page=ahc_hits_counter_menu_free'" style=" background-color: #e7e7e7; color: black;
+				<input type="button" name="cancel" value="back to dashboard" onclick="javascript:window.location.href = 'admin.php?page=ahc_hits_counter_menu_free'" style=" background-color: #e7e7e7; color: black;
   border: none;
 
   padding: 15px 32px;
@@ -306,13 +306,13 @@ $ahcproRobots = get_option('ahcproRobots');
   display: inline-block;
   font-size: 16px;
   border-radius:4px" />
-				
-				</form>
-				
-				
-				
+
+			</form>
+
+
+
 		</div>
-		
+
 	</div>
 
 </div>
