@@ -371,14 +371,14 @@ class WPHitsCounter
 				$this->countryInternetCode  =  $countryCode;
 			} else {
 
-				$ip_data = ahcfree_advanced_get_link("https://geoip-db.com/json/" . $vtr_ip_address);
+				$ip_data = ahcfree_advanced_get_link("https://geoip-db.com/json/" . $this->ipAddress);
 
 				$ahc_city =  isset($ip_data->city) ? $ip_data->city : '';
 				$ahc_region =  isset($ip_data->state) ? $ip_data->state : '';
 				$this->countryInternetCode = isset($ip_data->country_code) ? $ip_data->country_code : '';
 
 				if (empty($ip_data->country_code)) {
-					$ip_data = (ahcfree_advanced_get_link("http://www.geoplugin.net/json.gp?ip=" . $vtr_ip_address));
+					$ip_data = (ahcfree_advanced_get_link("http://www.geoplugin.net/json.gp?ip=" . $this->ipAddress));
 
 					$this->countryInternetCode = isset($ip_data->geoplugin_countryCode) ? $ip_data->geoplugin_countryCode : '';
 				}

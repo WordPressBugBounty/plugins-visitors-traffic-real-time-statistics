@@ -2,82 +2,88 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 6.7.1
-Stable tag: 7.7
+Tested up to: 6.7.2
+Stable tag: 7.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 This plugin will help you to track your visitors, browsers, operating systems, visits and much more in one dashboard page.
+
 == Description ==
 
-Visitor Traffic Real Time Statistics is a Counter and statistics plugin for WordPress to display your WordPress blog statistics and traffic. Ranging from general total statistics
-This plugin will help you to track your visitors, browsers, operating systems, visits and much more..<br />
-When it comes to ease of use, Visitor Traffic Real Time Statistics comes in first, You will have a real Counter and statistics plugin for your WordPress website..
-This plugin will help you to track your visitors, browsers, operating systems, visits and much more in one dashboard page..
+# 📊 <strong>Visitor Traffic Real-Time Statistics for WordPress</strong>
 
-And you can use one the summary statistics shortcodes:
+Unlock powerful insights into your website traffic with<strong>Visitor Traffic Real-Time Statistics</strong>, the ultimate WordPress plugin for tracking visitors, visits, browsers, operating systems, and more — all in one intuitive dashboard. 
 
-You can use one of the following shortcodes:
+With real-time data and easy-to-use shortcodes, you’ll get a complete picture of your site's performance without the complexity. Whether you're a blogger, business owner, or marketer, this plugin gives you the tools to understand your audience better and make smarter decisions.
 
-* **[ahc_stats_widget]** adds a front-end widget to display the site statistics
-* **[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]** adds a front-end widget to display the site statistics with custom parametrs
+---
 
-* **[ahc_today_visitors]** this will return today's visitors
-* **[ahc_today_visits]** this will return today's visits
-* **[ahc_total_visitors]** this will return total visitors
-* **[ahc_total_visits]** this will return total visits
+### 🚀<strong>Why Choose Visitor Traffic Real-Time Statistics?</strong>
 
+- 🟢<strong>Real-Time Visitor Tracking:</strong> See who’s visiting your site and when — in real-time.  
+- 🟢<strong>User-Friendly Dashboard:</strong> All your key insights are displayed on a single, easy-to-navigate dashboard.  
+- 🟢<strong>Comprehensive Analytics:</strong> Track visitors by country, device, browser, operating system, referrer, and more.  
+- 🟢<strong>Shortcode Integration:</strong> Display visitor stats anywhere on your site with simple shortcodes.  
+- 🟢<strong>SEO Insights:</strong> Monitor keywords, search engine referrals, and traffic sources to improve your SEO performance.  
 
-<strong>Visitor Traffic Real Time Statistics Basic version includes: </strong>
-<ul>
-<li>Comprehensive overview page (Dashboard), including browser versions, country stats, hits, exclusions, referrers, searches, search words and visitors</li>
-<li>Visits & Visitors, see how many hits your site get in the last two weeks</li>
-<li>see how many people are viewing your site by weekly statistics</li>
-<li>Search Engines, see search queries and redirects from popular search engines like Google, Bing, DuckDuckGo, Yahoo, Yandex and Baidu</li>
-<li>Browsers statistics will help you to see the most popular browser</li>
-<li>Recent visitors and the visitor source , also you can see the referrer link	</li>
-<li>Top referring sites & the visitors count for each one</li>
-<li>Shortcode support</li>
+---
 
-</ul>
+### 📊<strong>Available Shortcodes (Simple & Flexible)</strong>  
 
-<p></p>
-<strong>Visitor Traffic Real Time Statistics Pro includes: </strong>
-<p></p>
-&#9989;<a href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/#readme"><strong> PRO version product page</strong></a>
-<p></p>
-<ul>
+Add these shortcodes to any post, page, or widget to showcase your traffic stats:
 
-<li>Multisite (network) support</li>
-<li>User online to show how many people are currently viewing your blog</li>
-<li>Comprehensive overview page (Dashboard), including browser versions, country stats, hits, exclusions, referrers, searches, search words and visitors</li>
-<li>Visits, see how many hits your site gets each day and each week & month</li>
-<li>Visitors, see who's visiting your site</li>
-<li>see how many people are viewing your site by monthly statistics</li>
-<li>Page tracking, see which pages are viewed most often</li>
-<li>Search Engines, see search queries and redirects from popular search engines like Google, Bing, DuckDuckGo, Yahoo, Yandex and Baidu</li>
-<li>visitors locations by Countries</li>
-<li>Visits & Visitors Statistics will help you to see how many hits your site gets each day & see who's visiting your site</li>
-<li>Interactive Google map of visitors location</li>
-<li>Referral search engines in the last month</li>
-<li>Browsers statistics will help you to see the most popular browser</li>
-<li>Recent visitors and the visitor source , also you can see the referrer link	</li>
-<li>Top referring sites & the visitors count for each one</li>
-<li>Visits time graph to view the daily visitors per hour</li>
-<li>GeoIP location by Country using maxmind database</li>
-<li>The latest search key words, this will help you to know the most popular keyword</li>
-<li>Traffic by title Statistics will help you to see the top ten posts and number of hits</li>
+-  `[ahc_stats_widget]` – Display a site-wide statistics widget on the front end.  
+-  `[ahc_stats_widget title="Your Title" fontsize="16" display_today_visitors=true display_total_visitors=true]` – Customize the widget with your own parameters.  
+-  `[ahc_today_visitors]` – Display today's visitors.  
+-  `[ahc_today_visits]` – Display today’s page views.  
+-  `[ahc_total_visitors]` – Show your all-time visitor count.  
+-  `[ahc_total_visits]` – Display total visits to your site.  
 
-</ul>
-<p></p>
+---
 
+## 🆓<strong>Free Version Features:</strong>
 
-<strong>Useful Links:</strong>
+- ✔️ Real-time visitor tracking and stats.  
+- ✔️ Insights into browsers, countries, hits, referrals, and searches.  
+- ✔️ Track daily, weekly, and monthly visitor trends.  
+- ✔️ Shortcodes to display key stats on your site.  
+- ✔️ Track top referring websites and keywords.  
 
-&#9989;<a href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/#gopro"><strong> Go PRO Now :)</strong></a>
-&#9989;<a href="https://www.wp-buy.com/support-center/"><strong>Support Center</strong></a> <br />
+---
 
+## 🔥<strong>Upgrade to Pro for Even More Power!</strong>
 
+Take your analytics to the next level with<strong>Visitor Traffic Real-Time Statistics Pro</strong>:
+
+- 🚀<strong>Multisite Support:</strong> Track traffic across multiple sites in one place.  
+- 🚀<strong>Live User Tracking:</strong> See how many people are online right now.  
+- 🌎<strong>Interactive Google Maps:</strong> Visualize visitor locations globally.  
+- 📊<strong>Advanced Page Tracking:</strong> Identify your most popular posts and pages.  
+- 📈<strong>Detailed Visit Graphs:</strong> Analyze visitor activity by the hour.  
+- 🔍<strong>Advanced SEO Insights:</strong> Discover the keywords driving traffic to your site.  
+- 🖨️<strong>Customizable Reports:</strong> Get actionable insights with easy-to-read reports.  
+
+---
+
+### 🌍<strong>Who Can Benefit?</strong>
+
+- 👨‍💻 Bloggers who want to track reader engagement.  
+- 🛒 E-commerce store owners looking to understand customer behavior.  
+- 📈 Marketers seeking to optimize SEO strategies.  
+- ⚙️ Website administrators who need detailed traffic analysis.  
+
+---
+
+## ✅<strong>Get Started Today!</strong>
+
+🎯<strong>Install the plugin now</strong> to gain valuable insights into your site traffic and grow your online presence.
+
+🔗<strong>[Go PRO Now](https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/#gopro)</strong> to unlock all premium features and maximize your analytics potential!  
+
+💬<strong>[Visit Our Support Center](https://www.wp-buy.com/support-center/)</strong> for any assistance.  
+
+</strong>📢 Your website is getting visitors. Don’t miss out on the insights that can help your business grow.</strong> 🚀
 
 == Installation ==
 1. Download the package.
@@ -116,16 +122,16 @@ Notes:
 = Shortcodes for summary statistics =
 You can use one of the following shortcodes:
 
-* **[ahc_stats_widget]** adds a front-end widget to display the site statistics
-* **[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]** adds a front-end widget to display the site statistics with custom parametrs
+*<strong>[ahc_stats_widget]</strong> adds a front-end widget to display the site statistics
+*<strong>[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]</strong> adds a front-end widget to display the site statistics with custom parametrs
 
-* **[ahc_today_visitors]** this will return today's visitors
-* **[ahc_today_visits]** this will return today's visits
-* **[ahc_total_visitors]** this will return total visitors
-* **[ahc_total_visits]** this will return total visits
+*<strong>[ahc_today_visitors]</strong> this will return today's visitors
+*<strong>[ahc_today_visits]</strong> this will return today's visits
+*<strong>[ahc_total_visitors]</strong> this will return total visitors
+*<strong>[ahc_total_visits]</strong> this will return total visits
 
-* **[ahc_yesterday_total_visitors]** this will return the yesterday's total visitors
-* **[ahc_yesterday_total_visits]** this will return the yesterday's total visits
+*<strong>[ahc_yesterday_total_visitors]</strong> this will return the yesterday's total visitors
+*<strong>[ahc_yesterday_total_visits]</strong> this will return the yesterday's total visits
 
 = GDPR Compliant? =
 All the data is saved locally in your WordPress, it’s not necessary to create a data processing contract with an external company!
@@ -176,6 +182,9 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 7.8 =
+1. Ensure $vtr_ip_address is properly initialized before usage to prevent undefined variable warnings.
 
 = 7.7 =
 
@@ -233,13 +242,13 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 You can use one of the following shortcodes:
 
-* **[ahc_stats_widget]** adds a front-end widget to display the site statistics
-* **[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]** adds a front-end widget to display the site statistics with custom parametrs
+*<strong>[ahc_stats_widget]</strong> adds a front-end widget to display the site statistics
+*<strong>[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]</strong> adds a front-end widget to display the site statistics with custom parametrs
 
-* **[ahc_today_visitors]** this will return today's visitors
-* **[ahc_today_visits]** this will return today's visits
-* **[ahc_total_visitors]** this will return total visitors
-* **[ahc_total_visits]** this will return total visits
+*<strong>[ahc_today_visitors]</strong> this will return today's visitors
+*<strong>[ahc_today_visits]</strong> this will return today's visits
+*<strong>[ahc_total_visitors]</strong> this will return total visitors
+*<strong>[ahc_total_visits]</strong> this will return total visits
 
 
 = 6.4 =
@@ -275,13 +284,13 @@ You can use one of the following shortcodes:
 
 You can use one of the following shortcodes:
 
-* **[ahc_stats_widget]** adds a front-end widget to display the site statistics
-* **[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]** adds a front-end widget to display the site statistics with custom parametrs
+*<strong>[ahc_stats_widget]</strong> adds a front-end widget to display the site statistics
+*<strong>[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]</strong> adds a front-end widget to display the site statistics with custom parametrs
 
-* **[ahc_today_visitors]** this will return today's visitors
-* **[ahc_today_visits]** this will return today's visits
-* **[ahc_total_visitors]** this will return total visitors
-* **[ahc_total_visits]** this will return total visits
+*<strong>[ahc_today_visitors]</strong> this will return today's visitors
+*<strong>[ahc_today_visits]</strong> this will return today's visits
+*<strong>[ahc_total_visitors]</strong> this will return total visitors
+*<strong>[ahc_total_visits]</strong> this will return total visits
 
 = 5.5 =
 1. new feature (Shortcode instead of widget)
