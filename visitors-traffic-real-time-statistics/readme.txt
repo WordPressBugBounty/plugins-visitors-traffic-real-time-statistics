@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 6.7.2
-Stable tag: 7.8
+Stable tag: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -115,12 +115,12 @@ Notes:
 5. Go to your website main menu > visitor Traffic Pro
 
 Notes:
-* After installing the plugin you need to go to plugin settings page and select your timezone.
+* After installing the plugin you need to go to plugin settings page and select your time zone.
 * If you're using any caching plugins, Don't forget to clear your website cache.
 
 
-= Shortcodes for summary statistics =
-You can use one of the following shortcodes:
+= Short codes for summary statistics =
+You can use one of the following short codes:
 
 *<strong>[ahc_stats_widget]</strong> adds a front-end widget to display the site statistics
 *<strong>[ahc_stats_widget title="" fontsize="16" fonttype="" display_today_visitors=true display_today_pageviwes=true display_total_visitors=true display_total_pageviwes=true ]</strong> adds a front-end widget to display the site statistics with custom parametrs
@@ -141,14 +141,14 @@ This plugin doesn’t officially support the multisite feature; But it should fu
 
 = How do I stop automatically unzipping downloaded zip files in Mac Safari? =
 
-If you are MAC user,  you may face this problem problem
+If you are MAC user,  you may face this problem 
 
 Your browser (Safari) is automatically unzipping downloaded zip files ? And this is not good because i want the plugin file to still compressed as is
 To fix this please do the following steps:
 
 1. Open Safari
 2. Click Preferences
-3. Under the General tab, unCheck the option Open “safe” files after downloadin
+3. Under the General tab, uncheck the option Open “safe” files after downloading
 
 = Does this plugin work with caching plugins? =
 Yes, the cache support added in the latest 5 versions.
@@ -158,7 +158,7 @@ If you're using any caching plugins, Don't forget to clear your website cache.
 
 
 = PHP 7 Support? =
-yes, This plugin is working fine with PHP 7.x, If you have any issues.Please feel free to report it.
+Yes, this plugin is fully compatible with PHP 7.x and PHP 8.x. If you encounter any issues, please don't hesitate to report them.
 
 = IPv6 Support? =
 This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabled;
@@ -182,6 +182,11 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+
+= 8.1 =
+1. Compatibility issue with certain ad blockers causing page display errors.
+
 
 = 7.8 =
 1. Ensure $vtr_ip_address is properly initialized before usage to prevent undefined variable warnings.

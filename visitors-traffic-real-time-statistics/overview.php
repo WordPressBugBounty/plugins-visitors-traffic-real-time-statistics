@@ -33,7 +33,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
 <script language="javascript" type="text/javascript">
     function imgFlagError(image) {
         image.onerror = "";
-        image.src = "<?php echo plugins_url('/images/flags/noFlag.png', AHCFREE_PLUGIN_MAIN_FILE) ?>";
+        image.src = "<?php echo plugins_url('images/flags/noFlag.png', AHCFREE_PLUGIN_MAIN_FILE) ?>";
         return true;
     }
 
@@ -116,8 +116,8 @@ $mystart_date = $mystart_date->format('Y-m-d');
     </div>
     <div class="row">
         <div class="col-lg-8">
-            <h1><img height="55px" src="<?php echo esc_url(plugins_url('/images/logo.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>">&nbsp;Visitor Traffic Real Time Statistics free &nbsp;
-				<?php if(current_user_can('manage_options')){?><a title="change settings" href="admin.php?page=ahc_hits_counter_settings"><img src="<?php echo esc_url(plugins_url('/images/settings.jpg', AHCFREE_PLUGIN_MAIN_FILE)) ?>" /></a><?php }?></h1>
+            <h1><img height="55px" src="<?php echo esc_url(plugins_url('images/logo.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>">&nbsp;Visitor Traffic Real Time Statistics free &nbsp;
+				<?php if(current_user_can('manage_options')){?><a title="change settings" href="admin.php?page=ahc_hits_counter_settings"><img src="<?php echo esc_url(plugins_url('images/settings.jpg', AHCFREE_PLUGIN_MAIN_FILE)) ?>" /></a><?php }?></h1>
 
         </div>
         <div class="col-lg-4">
@@ -129,8 +129,8 @@ $mystart_date = $mystart_date->format('Y-m-d');
     <div class="row">
         <div class="col-lg-3">
             <div class="box_widget greenBox">
-                <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true"><img src="<?php echo esc_url(plugins_url('/images/upgrade_now.png', AHCFREE_PLUGIN_MAIN_FILE)) ?>"></a>
-                <br /><span class="txt"><img src="<?php echo esc_url(plugins_url('/images/live.gif', AHCFREE_PLUGIN_MAIN_FILE)) ?>">&nbsp; Online Users</span>
+                <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true"><img src="<?php echo esc_url(plugins_url('images/upgrade_now.png', AHCFREE_PLUGIN_MAIN_FILE)) ?>"></a>
+                <br /><span class="txt"><img src="<?php echo esc_url(plugins_url('images/live.gif', AHCFREE_PLUGIN_MAIN_FILE)) ?>">&nbsp; Online Users</span>
             </div>
         </div>
         <div class="col-lg-3">
@@ -193,7 +193,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
                 <div class="panelcontent" style="width:100% !important">
                     <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo esc_url(plugins_url('/images/geomap_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
+                        <img width="99%" src="<?php echo esc_url(plugins_url('images/geomap_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
                     </a>
                 </div>
             </div>
@@ -376,7 +376,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
                 <div class="panelcontent" style="width:100% !important">
                     <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo plugins_url('/images/today_traffic_by_country_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE) ?>">
+                        <img width="99%" src="<?php echo plugins_url('images/today_traffic_by_country_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE) ?>">
                     </a>
                 </div>
 
@@ -441,7 +441,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                 <h2 class="box-heading" style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">Traffic by country (all time)</h2>
                 <div class="panelcontent" style="width:100% !important">
                     <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo esc_url(plugins_url('/images/traffic_by_country_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
+                        <img width="99%" src="<?php echo esc_url(plugins_url('images/traffic_by_country_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
                     </a>
                 </div>
             </div>
@@ -455,7 +455,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
                 <div class="panelcontent" style="width:100% !important">
                     <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo esc_url(plugins_url('/images/top_refferring_countries_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
+                        <img width="99%" src="<?php echo esc_url(plugins_url('images/top_refferring_countries_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
                     </a>
                 </div>
 
@@ -492,7 +492,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                                     str_replace('https://', '', $site['site_name']);
                             ?>
                                     <tr>
-                                        <td class="values"><?php echo esc_html($site['site_name']); ?>&nbsp;<a href="https://<?php echo str_replace('http://', '', esc_url($site['site_name'])) ?>" target="_blank"><img src="<?php echo esc_url(plugins_url('/images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) ?>" title="<?php echo esc_attr(ahc_view_referer) ?>"></a></td>
+                                        <td class="values"><?php echo esc_html($site['site_name']); ?>&nbsp;<a href="https://<?php echo str_replace('http://', '', esc_url($site['site_name'])) ?>" target="_blank"><img src="<?php echo esc_url(plugins_url('images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) ?>" title="<?php echo esc_attr(ahc_view_referer) ?>"></a></td>
                                         <td class="values"><?php echo intval($site['total_hits']); ?></td>
                                     </tr>
 
@@ -682,7 +682,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                                 ?>
                                     <tr>
                                         <td>
-                                            <span><?php if ($searchWord['ctr_internet_code'] != '') { ?><img src="<?php echo plugins_url('/images/flags/' . strtolower($searchWord['ctr_internet_code']) . '.png', AHCFREE_PLUGIN_MAIN_FILE); ?>" border="0" width="22" height="18" title="<?php echo esc_html($searchWord['ctr_name']) ?>" onerror="imgFlagError(this)" /><?php } ?></span>
+                                            <span><?php if ($searchWord['ctr_internet_code'] != '') { ?><img src="<?php echo plugins_url('images/flags/' . strtolower($searchWord['ctr_internet_code']) . '.png', AHCFREE_PLUGIN_MAIN_FILE); ?>" border="0" width="22" height="18" title="<?php echo esc_html($searchWord['ctr_name']) ?>" onerror="imgFlagError(this)" /><?php } ?></span>
                                         </td>
                                         <td class="hide"><?php echo esc_html($searchWord['csb']); ?></td>
                                         <td>
@@ -714,7 +714,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&footer=true">
                         <p style="color:#00F; font-size:15px;">if you need more statistics you can upgrade to the professional version now, The premium version of Visitor Traffic real-time statistics is completely different from the free version as there are a lot more features included.</p>
 
-                        <p><img  height="auto" src="<?php echo esc_url(plugins_url('/images/upgradenow-button.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>" /></p>
+                        <p><img  height="auto" src="<?php echo esc_url(plugins_url('images/upgradenow-button.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>" /></p>
                     </a>
                 </center>
             </div>

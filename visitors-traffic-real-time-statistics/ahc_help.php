@@ -1,7 +1,7 @@
 <script language="javascript" type="text/javascript">
     function imgFlagError(image) {
         image.onerror = "";
-        image.src = "<?php echo plugins_url('/images/flags/noFlag.png', AHCFREE_PLUGIN_MAIN_FILE) ?>";
+        image.src = "<?php echo plugins_url('images/flags/noFlag.png', AHCFREE_PLUGIN_MAIN_FILE) ?>";
         return true;
     }
 </script>
@@ -9,7 +9,7 @@
 
 
 <div class="ahc_main_container">
-    <h1><img width="70px" src="<?php echo plugins_url('/images/logo.png', AHCFREE_PLUGIN_MAIN_FILE) ?>">&nbsp;Visitor Traffic Real Time Statistics Free <a title="change settings" href="admin.php?page=ahc_hits_counter_settings"><img src="<?php echo plugins_url('/images/settings.jpg', AHCFREE_PLUGIN_MAIN_FILE) ?>" /></a></h1><br />
+    <h1><img width="70px" src="<?php echo plugins_url('images/logo.png', AHCFREE_PLUGIN_MAIN_FILE) ?>">&nbsp;Visitor Traffic Real Time Statistics Free <a title="change settings" href="admin.php?page=ahc_hits_counter_settings"><img src="<?php echo plugins_url('images/settings.jpg', AHCFREE_PLUGIN_MAIN_FILE) ?>" /></a></h1><br />
 
     <div class="panel grid-Qr" style="border-radius: 7px !important;
     border: 0 !important;  box-shadow: 0 4px 25px 0 rgb(168 180 208 / 10%) !important; padding:15px; background:#fff ; width: 90%; ">
@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <img style="float:right" height="150px" src="<?php echo plugins_url('/images/24_7.ico', AHCFREE_PLUGIN_MAIN_FILE) ?>" />
+                    <img style="float:right" height="150px" src="<?php echo plugins_url('images/24_7.ico', AHCFREE_PLUGIN_MAIN_FILE) ?>" />
                 </div>
             </div>
 
@@ -53,7 +53,7 @@
             <p>
             <h3>Have your own issue? Create A New Ticket</h3>
             </p>
-            <p><a href="https://www.wp-buy.com/support-center/" target="_blank"><img title="create new ticket" border="0" src="<?php echo plugins_url('/images/newticket.png', AHCFREE_PLUGIN_MAIN_FILE) ?>" /></a></p>
+            <p><a href="https://www.wp-buy.com/support-center/" target="_blank"><img title="create new ticket" border="0" src="<?php echo plugins_url('images/newticket.png', AHCFREE_PLUGIN_MAIN_FILE) ?>" /></a></p>
         </div>
     </div>
 

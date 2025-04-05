@@ -694,7 +694,7 @@ function ahcfree_create_admin_menu_link()
 
 
 
-    add_menu_page('Visitor Traffic Real Time Statistics Free', 'Visitor Traffic', 'read', 'ahc_hits_counter_menu_free', 'ahcfree_create_plugin_overview_page', plugins_url('/images/vtrts.png', AHCFREE_PLUGIN_MAIN_FILE));
+    add_menu_page('Visitor Traffic Real Time Statistics Free', 'Visitor Traffic', 'read', 'ahc_hits_counter_menu_free', 'ahcfree_create_plugin_overview_page', plugins_url('images/vtrts.png', AHCFREE_PLUGIN_MAIN_FILE));
     add_submenu_page('ahc_hits_counter_menu_free', 'Settings', 'Settings', 'manage_options', 'ahc_hits_counter_settings', 'ahcfree_create_plugin_settings_page');
     add_submenu_page('ahc_hits_counter_menu_free', 'Contact Support', 'Help', 'manage_options', 'ahc_hits_counter_help', 'ahcfree_create_plugin_help_page');
 
@@ -760,7 +760,7 @@ function ahcfree_enqueue_scripts()
     if (is_archive()) {
         $post_id = get_the_archive_title();
     }
-    wp_register_script('ahc_front_js', plugins_url('/js/front.js', AHCFREE_PLUGIN_MAIN_FILE), 'jquery', '', false);
+    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), 'jquery', '', false);
     wp_enqueue_script('ahc_front_js');
 
     wp_localize_script('ahc_front_js', 'ahc_ajax_front', array(
@@ -2064,7 +2064,7 @@ function ahcfree_get_top_countries($limit = 0, $start = '', $pagelimit = '', $al
         $rank = $start + 1;
         foreach ($results as $ctr) {
             $response['data'][$c]['rank'] = $rank;
-            $furl = plugins_url('/images/flags/' . strtolower($ctr->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
+            $furl = plugins_url('images/flags/' . strtolower($ctr->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
             $flag = '<img src="' . esc_url($furl) . '" border="0" alt="' . esc_attr($ctr->ctr_name) . '" width="30" height="20" onerror="imgFlagError(this)" />';
             $response['data'][$c]['flag'] = $flag;
             $response['data'][$c]['ctr_name'] = $ctr->ctr_name;
@@ -2157,7 +2157,7 @@ function ahcfree_get_vsitors_by_country($all, $cnt = true, $start = '', $limit =
         foreach ($results as $ctr) {
 
             /*if ($ctr->total > 1) {*/
-            $imgurl = plugins_url('/images/flags/' . strtolower($ctr->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
+            $imgurl = plugins_url('images/flags/' . strtolower($ctr->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
             $arr[$c]['no'] = $no;
             $arr[$c]['country'] = '<img src="' . $imgurl . '" border="0" alt="' . $ctr->ctr_name . '" width="30" height="20" onerror="imgFlagError(this)" />';
             $arr[$c]['ctr_name'] = $ctr->ctr_name;
@@ -2183,7 +2183,7 @@ function ahcfree_get_vsitors_by_country($all, $cnt = true, $start = '', $limit =
         if ($sum > 0) {
             $k = count($arr);
             $arr[$k]['no'] = $no;
-            $imgurl = plugins_url('/images/flags/xx.png', AHCFREE_PLUGIN_MAIN_FILE);
+            $imgurl = plugins_url('images/flags/xx.png', AHCFREE_PLUGIN_MAIN_FILE);
             $arr[$k]['country'] = '<img src="' . esc_url($imgurl) . '" border="0" alt="' . esc_url($ctr->ctr_name) . '" width="30" height="20" onerror="imgFlagError(this)" />';
             $arr[$k]['ctr_name'] = 'others';
             $arr[$k]['ctr_internet_code'] = 'XX';
@@ -2302,15 +2302,15 @@ function ahcfree_get_recent_visitors($all, $cnt = true, $start = '', $limit = ''
 
                     $arr[$c]['hit_id'] = $hit->vtr_id;
                     $hit_referer = (parse_url($hit->vtr_referer, PHP_URL_HOST) == $_SERVER['SERVER_NAME']) ? '' : rawurldecode($hit->vtr_referer);
-                    $hitip = (!empty($hit->hit_referer) ? '<a href="' . esc_url($hit_referer) . '" target="_blank"><img src="' . esc_url(plugins_url('/images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) . '" title="' . esc_attr(ahc_view_referer) . '"></a>' : '');
+                    $hitip = (!empty($hit->hit_referer) ? '<a href="' . esc_url($hit_referer) . '" target="_blank"><img src="' . esc_url(plugins_url('images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) . '" title="' . esc_attr(ahc_view_referer) . '"></a>' : '');
                     $arr[$c]['hit_ip_address'] = (get_option('ahcfree_ahcfree_haships') != '1') ? $hit->vtr_ip_address . "&nbsp;" . $hitip : ahcfree_haship($hit->vtr_ip_address) . "&nbsp;" . $hitip;
                     $img = "";
                     if ($hit->ctr_internet_code != '') {
-                        $imgurl = plugins_url('/images/flags/' . strtolower($hit->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
+                        $imgurl = plugins_url('images/flags/' . strtolower($hit->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
                         $img = "<img src='" . esc_url($imgurl) . "' border='0' width='22' height='18' title='" . esc_attr($hit->ctr_name) . "' onerror='imgFlagError(this)' />&nbsp;";
                     }
 
-                    // $bimgurl = plugins_url('/images/browsers/' . $hit->bsr_icon, AHCFREE_PLUGIN_MAIN_FILE);
+                    // $bimgurl = plugins_url('images/browsers/' . $hit->bsr_icon, AHCFREE_PLUGIN_MAIN_FILE);
                     // $bimg = '<img src="'.$bimgurl.'" border="0" width="20" height="20" title="'.$hit->bsr_name.'" />&nbsp;';
                     $arr[$c]['hit_date'] = $hit->vtr_date;
                     $arr[$c]['hit_time'] = $hit->vtr_time;
@@ -2436,14 +2436,14 @@ function ahcfree_get_latest_search_key_words_used($all, $cnt = true, $start = ''
 
             $img = '<span>';
             if ($re->ctr_internet_code != '') {
-                $imgurl = plugins_url('/images/flags/' . strtolower($re->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
+                $imgurl = plugins_url('images/flags/' . strtolower($re->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
                 $img .= '<img src="' . esc_url($imgurl) . '" border="0" width="22" height="18" title="' . esc_attr($re->ctr_name) . '" onerror="imgFlagError(this)" />';
             }
             $img .= '&nbsp;' . esc_html($re->ctr_name) . '</span>';
-            /*$eurl=plugins_url('/images/search_engines/' . $re->srh_icon, AHCFREE_PLUGIN_MAIN_FILE);
+            /*$eurl=plugins_url('images/search_engines/' . $re->srh_icon, AHCFREE_PLUGIN_MAIN_FILE);
 			$img.='<span><img src="'.$eurl.'" border="0" width="22" height="22" title="'.$re->srh_name.'" /></span>';
 			
-			$burl=plugins_url('/images/browsers/' . $re->bsr_icon, AHCFREE_PLUGIN_MAIN_FILE);
+			$burl=plugins_url('images/browsers/' . $re->bsr_icon, AHCFREE_PLUGIN_MAIN_FILE);
 			$img.='<span><img src="'.$burl.'" border="0" width="20" height="20" title="'.$re->bsr_name.'" /></span>';
 			*/
             $arr[$c]['img'] = $img;
@@ -3127,10 +3127,10 @@ function ahcfree_get_client_ip_address()
  */
 function ahcfree_include_scripts()
 {
-    wp_register_style('ahc_custom_css', plugins_url('/css/custom.css', AHCFREE_PLUGIN_MAIN_FILE), '', time());
+    wp_register_style('ahc_custom_css', plugins_url('css/custom.css', AHCFREE_PLUGIN_MAIN_FILE), '', time());
     wp_enqueue_style('ahc_custom_css');
 
-    wp_register_style('ahc_lang_css', plugins_url('/css/vtrts_css_stylesheet.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.4');
+    wp_register_style('ahc_lang_css', plugins_url('css/vtrts_css_stylesheet.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.4');
     wp_enqueue_style('ahc_lang_css');
 
 
@@ -3141,47 +3141,47 @@ function ahcfree_include_scripts()
     wp_register_style('slimselect', plugins_url('css/slimselect.min.css', AHCFREE_PLUGIN_MAIN_FILE));
     wp_enqueue_style('slimselect');
 
-    wp_register_style('ahc_bootstrap_css', plugins_url('/lib/bootstrap/css/bootstrap.min.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_style('ahc_bootstrap_css', plugins_url('lib/bootstrap/css/bootstrap.min.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_style('ahc_bootstrap_css');
 
     wp_enqueue_script('jquery');
 
-    wp_register_script('ahc_bootstrap_js', plugins_url('/lib/bootstrap/js/bootstrap.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_bootstrap_js', plugins_url('lib/bootstrap/js/bootstrap.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_bootstrap_js');
 
-    wp_register_script('ahc_lang_js', plugins_url('/lang/js/' . GlobalsAHC::$lang . '_lang.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_lang_js', plugins_url('lang/js/' . GlobalsAHC::$lang . '_lang.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_lang_js');
 
     /* Pagination and export */
-    wp_register_script('ahc_datatable_js', plugins_url('/js/jquery.dataTables.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_datatable_js', plugins_url('js/jquery.dataTables.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_datatable_js');
-    wp_register_script('ahc_tableexport_js', plugins_url('/js/dataTables.buttons.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_tableexport_js', plugins_url('js/dataTables.buttons.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_tableexport_js');
-    wp_register_script('ahc_jzip_js', plugins_url('/js/jszip.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_jzip_js', plugins_url('js/jszip.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_jzip_js');
-    wp_register_script('ahc_tableexportbutton_js', plugins_url('/js/buttons.html5.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_tableexportbutton_js', plugins_url('js/buttons.html5.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_tableexportbutton_js');
 
-    wp_register_script('ahc_xlscore_js', plugins_url('/js/xlsx.core.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_xlscore_js', plugins_url('js/xlsx.core.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_xlscore_js');
-    wp_register_script('ahc_filesave_js', plugins_url('/js/FileSaver.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_filesave_js', plugins_url('js/FileSaver.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_filesave_js');
-    wp_register_script('ahc_xls_js', plugins_url('/js/jhxlsx.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_xls_js', plugins_url('js/jhxlsx.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_xls_js');
 
-    wp_register_style('jquery_date_css', plugins_url('/css/datepicker.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_style('jquery_date_css', plugins_url('css/datepicker.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_style('jquery_date_css');
 
 
 
     wp_enqueue_script('jquery-ui-datepicker', array('jquery'));
-    wp_register_script('ahc_main_js', plugins_url('/js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), '', '2.5');
+    wp_register_script('ahc_main_js', plugins_url('js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), '', '2.5');
     wp_enqueue_script('ahc_main_js');
 
     wp_localize_script('ahc_main_js', 'ahc_ajax', array('ajax_url' => admin_url('admin-ajax.php')));
 
-    wp_enqueue_script('sweetalert', plugins_url('/js/sweetalert.min.js', AHCFREE_PLUGIN_MAIN_FILE));
-    wp_enqueue_style('sweetalert', plugins_url('/css/sweetalerts.css', AHCFREE_PLUGIN_MAIN_FILE));
+    wp_enqueue_script('sweetalert', plugins_url('js/sweetalert.min.js', AHCFREE_PLUGIN_MAIN_FILE));
+    wp_enqueue_style('sweetalert', plugins_url('css/sweetalerts.css', AHCFREE_PLUGIN_MAIN_FILE));
 }
 
 
@@ -3190,12 +3190,12 @@ function ahcfree_settings_scripts()
 {
 
 
-    wp_register_style('ahc_bootstrap_css', plugins_url('/lib/bootstrap/css/bootstrap.min.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_style('ahc_bootstrap_css', plugins_url('lib/bootstrap/css/bootstrap.min.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_style('ahc_bootstrap_css');
 
     wp_enqueue_script('jquery');
 
-    wp_register_script('ahc_bootstrap_js', plugins_url('/lib/bootstrap/js/bootstrap.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
+    wp_register_script('ahc_bootstrap_js', plugins_url('lib/bootstrap/js/bootstrap.min.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.21');
     wp_enqueue_script('ahc_bootstrap_js');
 
     wp_register_script('slimselect_js', plugins_url('js/slimselect.min.js', AHCFREE_PLUGIN_MAIN_FILE), null, null, true);
@@ -3218,7 +3218,7 @@ function ahcfree_vtrts_add_items($admin_bar)
     //The properties of the new item. Read More about the missing 'parent' parameter below
     $args = array(
         'id' => 'visitorstraffic',
-        'title' => __('<img src="' . plugins_url('/images/vtrtspro.png', AHCFREE_PLUGIN_MAIN_FILE) . '" style="vertical-align:middle;margin-right:5px;" alt="visitor traffic" title="visitor traffic" />'),
+        'title' => __('<img src="' . plugins_url('images/vtrtspro.png', AHCFREE_PLUGIN_MAIN_FILE) . '" style="vertical-align:middle;margin-right:5px;" alt="visitor traffic" title="visitor traffic" />'),
         'href' => $wccpadminurl . 'admin.php?page=ahc_hits_counter_menu_free',
         'meta' => array('title' => __('Visitor Traffic Real Time Statistics'),)
     );
