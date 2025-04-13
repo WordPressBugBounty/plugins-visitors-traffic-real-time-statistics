@@ -29,6 +29,40 @@ $mystart_date = $mystart_date->format('Y-m-d');
     body {
         background: #F1F1F1 !important
     }
+	
+	.swal2-content {
+  font-size:18px;
+  text-aight:center !important;
+}
+
+.swal-noscroll h2{
+	display:none
+	
+}
+
+.swal2-modal {
+  margin: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  position: fixed !important;
+  text-aight:center !important;
+  
+}
+
+.swal2-modal{
+	 width: 800px !important;
+  max-width: 95%;
+  padding: 10px;
+  margin: 0 auto; /* يحاول يوسّط بالعرض */
+	
+}
+
+.swal2-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
 </style>
 <script language="javascript" type="text/javascript">
     function imgFlagError(image) {
@@ -926,28 +960,28 @@ var firstparam=fullparam[0];
 
 if(localStorage && (firstparam=="?page=ahc_hits_counter_menu_free"))
 {
-	
+
 var today_visitors_box = document.getElementById('today_visitors_box').innerHTML;
     if (!localStorage.getItem("ahcfreemsg")==true)
     {
+		
 	if(today_visitors_box > 5)
 	{
 		setTimeout(function(){
 		
 	  swal({
-	  title: '',
-	  text: '',
-	  imageUrl: 'https://www.wp-buy.com/wp-content/uploads/2018/10/output_ZD6GUg-1-2.gif',
-	  imageWidth: 'auto',
-	  imageHeight: 'auto',
-	  imageAlt: 'Need more statistics, GEO locations & online counter?',
+	  title: 'Take Your Website Analytics to The Next Level!',
+	  text: 'Upgrade to Pro',
+	  imageUrl: '<?php echo plugin_dir_url( __FILE__ ); ?>images/ezgif.com-animated-gif-maker.gif',
+	  imageWidth: '95%',
+	  	  
 	  animation: true,
 	  customClass: 'swal-noscroll',
 	  allowEscapeKey:true,
 	  showCancelButton: false,
 	  showConfirmButton: false,
-	  html: 'Need more statistics, GEO locations & online counter?<br><br><center><button type="button" role="button" class="confirm btn btn-success SwalBtn2">' + 'Upgrade to pro' + '</button>&nbsp;&nbsp;' +
-        '<button type="button" role="button"  class="cancel btn btn-info SwalBtn1">' + 'Close' + '</button>&nbsp;&nbsp;'+
+	  html: 'Get real-time stats, visitor locations & live online counter, Unlock all PRO features now!?<br><br><center><button type="button" role="button" class="confirm btn btn-success SwalBtn2">' + 'Upgrade to PRO' + '</button>&nbsp;&nbsp;' +
+        '<button type="button" role="button"  class="cancel btn btn-info SwalBtn1">' + 'Maybe Later' + '</button>&nbsp;&nbsp;'+
         '<button type="button" role="button" class="confirm btn btn-warning SwalBtn3">' + "Dismiss" + '</button></center>'
 	});
 }, 5000);
