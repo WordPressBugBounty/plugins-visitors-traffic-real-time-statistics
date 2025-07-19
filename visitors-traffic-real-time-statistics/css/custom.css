@@ -17,7 +17,11 @@
     transform: translateX(0px);
   }
 }
-
+.current-hour-highlight {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+  font-weight: bold !important;
+}
 @media (max-width: 800px) {
     .add{
         display: flex !important;

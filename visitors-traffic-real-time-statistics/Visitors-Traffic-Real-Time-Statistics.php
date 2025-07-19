@@ -4,7 +4,7 @@ Plugin Name: Visitor Traffic Real Time Statistics
 Description: Hits counter that shows analytical numbers of your WordPress site visitors and hits.
 Author: wp-buy
 Author URI: https://www.wp-buy.com/
-Version: 8.2
+Version: 8.3
 Text Domain: visitors-traffic-real-time-statistics
 Domain Path: /languages
 */
@@ -15,6 +15,7 @@ define('AHCFREE_PLUGIN_ROOT_DIR', dirname(__FILE__));
 
 require_once(AHCFREE_PLUGIN_ROOT_DIR . "/functions.php");
 require_once(AHCFREE_PLUGIN_ROOT_DIR . "/init.php");
+require_once(AHCFREE_PLUGIN_ROOT_DIR . "/includes/admin-columns.php");
 
 if (!function_exists('get_plugin_data') or !function_exists('wp_get_current_user')) {
 	include_once(ABSPATH . 'wp-includes/pluggable.php');
@@ -199,12 +200,16 @@ add_action('plugin_action_links_' . $path, 'ahcfree_action_links');
 add_option('ahcfree_new_updates', date('Y-m-d', time()));
 
 
+
 if (get_option('ahcfree_hide_top_bar_icon') != '1') {
-	add_action('admin_bar_menu', 'vtrts_free_add_items',  40);
+	add_action('wp_footer', 'vtrts_free_adminbar_chart');
+	add_action('admin_footer', 'vtrts_free_adminbar_chart');
+	add_action('admin_bar_menu', 'vtrts_free_add_items', 100);
 	add_action('wp_enqueue_scripts', 'vtrts_free_top_bar_enqueue_style');
 	add_action('admin_enqueue_scripts', 'vtrts_free_top_bar_enqueue_style');
+	add_action('wp_enqueue_scripts', 'enqueue_canvasjs_free');
+	add_action('admin_enqueue_scripts', 'enqueue_canvasjs_free');
 }
-
 //--------------------------------------------
 
 add_action('admin_menu', 'ahcfree_add_external_links_as_submenu');

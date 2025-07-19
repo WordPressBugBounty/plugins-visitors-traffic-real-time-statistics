@@ -132,20 +132,6 @@ function ahc_yesterday_total_visitors_func()
     return ahcfree_NumFormat(intval($ahc_sum_stats['visitors']));
 }
 
-function vtrts_free_top_bar_enqueue_style()
-{
-
-?>
-    <style>
-        #wpadminbar #wp-admin-bar-vtrts_free_top_button .ab-icon:before {
-            content: "\f185";
-            color: #1DAE22;
-            top: 3px;
-        }
-    </style>
-    <?php
-
-}
 
 /**
  * Recursive sanitation for text or array
@@ -171,30 +157,429 @@ function ahc_free_sanitize_text_or_array_field($array_or_string)
     return $array_or_string;
 }
 
+
+
+function vtrts_free_top_bar_enqueue_style()
+{
+    wp_enqueue_style('admin-bar');
+    $custom_css = '
+    .canvasjs-chart-credit{
+        display: none !important;
+    }
+    #vtrtsFreeChart canvas {
+    border-radius: 6px;
+}
+
+.vtrts-free-adminbar-weekly-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+        #wpadminbar #wp-admin-bar-vtrts_free_top_button .ab-icon:before {
+            content: "\f185";
+            color: #1DAE22;
+            top: 3px;
+        }
+    #wp-admin-bar-vtrts_pro_top_button .ab-item {
+        min-width: 180px;
+    }
+    .vtrts-free-adminbar-dropdown {
+        min-width: 420px ;
+        padding: 18px 18px 12px 18px;
+        background: #23282d;
+        color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        margin-top: 10px;
+    }
+    .vtrts-free-adminbar-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 18px; /* row-gap column-gap */
+        margin-bottom: 18px;
+    }
+    .vtrts-free-adminbar-card {
+        background: #2c3338;
+        border-radius: 8px;
+        padding: 18px 18px 12px 18px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    /* Extra margin for the right column */
+    .vtrts-free-adminbar-card:nth-child(2),
+    .vtrts-free-adminbar-card:nth-child(4) {
+        margin-left: 10px !important;
+        padding-left: 10px !important;
+                padding-top: 6px !important;
+
+        margin-right: 10px !important;
+        padding-right : 10px !important;
+        margin-top: 10px !important;
+    }
+    .vtrts-free-adminbar-card:nth-child(1),
+    .vtrts-free-adminbar-card:nth-child(3) {
+        margin-left: 10px !important;
+        padding-left: 10px !important;
+                padding-top: 6px !important;
+
+        margin-top: 10px !important;
+                padding-right : 10px !important;
+
+    }
+    /* Extra margin for the bottom row */
+    .vtrts-free-adminbar-card:nth-child(3),
+    .vtrts-free-adminbar-card:nth-child(4) {
+        margin-top: 6px !important;
+        padding-top: 6px !important;
+        margin-top: 10px !important;
+    }
+    .vtrts-free-adminbar-card-title {
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 6px;
+        color: #fff;
+    }
+    .vtrts-free-adminbar-card-value {
+        font-size: 22px;
+        font-weight: bold;
+        color: #1DAE22;
+        margin-bottom: 4px;
+    }
+    .vtrts-free-adminbar-card-sub {
+        font-size: 12px;
+        color: #aaa;
+    }
+    .vtrts-free-adminbar-btn-wrap {
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    #wp-admin-bar-vtrts_free_top_button .ab-item{
+    min-width: 80px !important;
+        padding: 0px !important;
+    .vtrts-free-adminbar-btn {
+        display: inline-block;
+        background: #1DAE22;
+        color: #fff !important;
+        font-weight: bold;
+        padding: 8px 28px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 15px;
+        transition: background 0.2s;
+        margin-top: 8px;
+    }
+    .vtrts-free-adminbar-btn:hover {
+        background: #15991b;
+        color: #fff !important;
+    }
+
+    .vtrts-free-adminbar-dropdown-wrap { min-width: 0; padding: 0; }
+    #wpadminbar #wp-admin-bar-vtrts_free_top_button .vtrts-free-adminbar-dropdown { display: none; position: absolute; left: 0; top: 100%; z-index: 99999; }
+    #wpadminbar #wp-admin-bar-vtrts_free_top_button:hover .vtrts-free-adminbar-dropdown { display: block; }
+    
+        .ab-empty-item #wp-admin-bar-vtrts_free_top_button-default .ab-empty-item{
+    height:0px !important;
+    padding :0px !important;
+     }
+            #wpadminbar .quicklinks .ab-empty-item{
+        padding:0px !important;
+    }
+    .vtrts-free-adminbar-dropdown {
+    min-width: 420px;
+    padding: 18px 18px 12px 18px;
+    background: #23282d;
+    color: #fff;
+    border-radius: 12px; /* more rounded */
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25); /* deeper shadow */
+    margin-top: 10px;
+}
+
+.vtrts-free-adminbar-btn-wrap {
+    text-align: center;
+    margin-top: 18px; /* more space above */
+}
+
+.vtrts-free-adminbar-btn {
+    display: inline-block;
+    background: #1DAE22;
+    color: #fff !important;
+    font-weight: bold;
+    padding: 5px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 17px;
+    transition: background 0.2s, box-shadow 0.2s;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(29,174,34,0.15);
+    text-align: center;
+    line-height: 1.6;
+    
+}
+.vtrts-free-adminbar-btn:hover {
+    background: #15991b;
+    color: #fff !important;
+    box-shadow: 0 4px 16px rgba(29,174,34,0.25);
+}
+    
+
+';
+    wp_add_inline_style('admin-bar', $custom_css);
+}
+function ahcfree_get_visits_and_visitors_by_day_range($start_date, $end_date)
+{
+    global $wpdb;
+
+    // Initialize day map
+    $day_map = [];
+    $current = new DateTime($start_date);
+    $end = new DateTime($end_date);
+    $end->modify('+1 day');
+
+    while ($current < $end) {
+        $day_key = $current->format('Y-m-d');
+        $day_map[$day_key] = [
+            'day' => $day_key,
+            'visitors' => 0,
+            'visits' => 0
+        ];
+        $current->modify('+1 day');
+    }
+
+    // Query actual data from ahc_visitors
+    $results = $wpdb->get_results(
+        $wpdb->prepare("
+            SELECT DATE(`vst_date`) as day, 
+                   SUM(`vst_visitors`) as visitors, 
+                   SUM(`vst_visits`) as visits
+            FROM `ahc_visitors`
+            WHERE DATE(`vst_date`) BETWEEN %s AND %s
+              AND `site_id` = %d
+            GROUP BY day
+            ORDER BY day ASC
+        ", $start_date, $end_date, get_current_blog_id()),
+        ARRAY_A
+    );
+
+    // Fill day map with real data
+    foreach ($results as $row) {
+        if (isset($day_map[$row['day']])) {
+            $day_map[$row['day']]['visitors'] = (int)$row['visitors'];
+            $day_map[$row['day']]['visits'] = (int)$row['visits'];
+        }
+    }
+
+    // Prepare chart arrays
+    $dates = [];
+    $visitors = [];
+    $visits = [];
+
+    foreach ($day_map as $day_data) {
+        $dates[] = date('d/m', strtotime($day_data['day']));
+        $visitors[] = $day_data['visitors'];
+        $visits[] = $day_data['visits'];
+    }
+
+    return [
+        'dates' => $dates,
+        'visitors' => $visitors,
+        'visits' => $visits
+    ];
+}
+
+// Enqueue CanvasJS for Free version
+function enqueue_canvasjs_free()
+{
+    wp_enqueue_script('canvasjs-free', 'https://cdn.canvasjs.com/canvasjs.min.js', array(), null, true);
+}
+
+// Main function to add admin bar items for Free version
 function vtrts_free_add_items($admin_bar)
 {
     if (!current_user_can('manage_options')) {
         return;
     }
-    global $pluginsurl;
-    //The properties of the new item. Read More about the missing 'parent' parameter below
-    $args = array(
-        'id'    => 'vtrts_free_top_button',
-        'parent' => null,
-        'group'  => null,
-        'title' => '<span class="ab-icon"></span>' . '' . __('Stats', 'visitors-traffic-real-time-statistics'),
-        'href'  => admin_url('admin.php?page=ahc_hits_counter_menu_free'),
-        'meta'  => array(
-            'title' => __('visitor traffic real-time statistics', 'visitors-traffic-real-time-statistics'), //This title will show on hover
-            'class' => ''
-        )
+
+    $ahc_sum_stat = ahcfree_get_summary_statistics();
+
+    // Build chart data
+    $chart_data = ahcfree_get_visits_and_visitors_by_day_range(
+        date('Y-m-d', strtotime('-6 days')),
+        date('Y-m-d')
     );
 
-    //This is where the magic works.
-    $admin_bar->add_menu($args);
+    // Store data for use in footer
+    $GLOBALS['vtrts_free_chart_data'] = [
+        'labels' => $chart_data['dates'],
+        'data' => $chart_data['visitors']
+    ];
+
+    // Chart HTML
+    $chart_html = '<div class="vtrts-free-adminbar-weekly">'
+        . '<div class="vtrts-free-adminbar-weekly-title">' . __('Visitors - Last 7 Days', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '<div id="vtrtsFreeChart" style="height: 200px; width: 420px; background-color: #23282d; border-radius: 6px;"></div>'
+        . '</div>';
+
+    // Build dropdown HTML
+    $dropdown_html = '<div class="vtrts-free-adminbar-dropdown">'
+        . '<div class="vtrts-free-adminbar-grid">'
+        . '<div class="vtrts-free-adminbar-card">'
+        . '<div class="vtrts-free-adminbar-card-title">' . __('Visitors Today', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '<div class="vtrts-free-adminbar-card-value">' . ahcfree_NumFormat($ahc_sum_stat['today']['visitors']) . '</div>'
+        . '<div class="vtrts-free-adminbar-card-sub">' . sprintf(__('%s Visitiors yesterday. ', 'visitors-traffic-real-time-statistics'), ahcfree_NumFormat($ahc_sum_stat['yesterday']['visitors'])) . '</div>'
+        . '</div>'
+        . '<div class="vtrts-free-adminbar-card">'
+        . '<div class="vtrts-free-adminbar-card-title">' . __('Views Today', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '<div class="vtrts-free-adminbar-card-value">' . ahcfree_NumFormat($ahc_sum_stat['today']['visits']) . '</div>'
+        . '<div class="vtrts-free-adminbar-card-sub">' . sprintf(__('%s Visits yesterday.', 'visitors-traffic-real-time-statistics'), ahcfree_NumFormat($ahc_sum_stat['yesterday']['visits'])) . '</div>'
+        . '</div>'
+        . '<div class="vtrts-free-adminbar-card">'
+        . '<div class="vtrts-free-adminbar-card-title">' . __('Total Visitors', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '<div class="vtrts-free-adminbar-card-value">' . ahcfree_NumFormat($ahc_sum_stat['total']['visitors']) . '</div>'
+        . '<div class="vtrts-free-adminbar-card-sub">' . __('All Time', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '</div>'
+        . '<div class="vtrts-free-adminbar-card">'
+        . '<div class="vtrts-free-adminbar-card-title">' . __('Total Views', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '<div class="vtrts-free-adminbar-card-value">' . ahcfree_NumFormat($ahc_sum_stat['total']['visits']) . '</div>'
+        . '<div class="vtrts-free-adminbar-card-sub">' . __('All Time', 'visitors-traffic-real-time-statistics') . '</div>'
+        . '</div>'
+        . '</div>' . $chart_html
+        . '<div class="vtrts-free-adminbar-btn-wrap">'
+        . '<a href="' . esc_url(admin_url('admin.php?page=ahc_hits_counter_menu_free')) . '" class="vtrts-free-adminbar-btn">'
+        . __('Explore Details', 'visitors-traffic-real-time-statistics') . '</a>'
+        . '</div>'
+        . '</div>';
+
+    // Menu title - Static "Stats" text
+    $menu_title = '<span class="ab-icon"></span> ' . __('Stats', 'visitors-traffic-real-time-statistics');
+
+    $admin_bar->add_menu(array(
+        'id'    => 'vtrts_free_top_button',
+        'title' => $menu_title,
+        'href'  => false,
+        'meta'  => array(
+            'title' => __('Visitor Traffic Real Time Statistics', 'visitors-traffic-real-time-statistics'),
+            'class' => 'vtrts-free-admin-bar',
+        )
+    ));
+
+    $admin_bar->add_menu(array(
+        'id'     => 'vtrts_free_top_button_dropdown',
+        'parent' => 'vtrts_free_top_button',
+        'title'  => $dropdown_html,
+        'href'   => false,
+        'meta'   => array('class' => 'vtrts-free-adminbar-dropdown-wrap')
+    ));
 }
 
+// Chart rendering function for Free version
+function vtrts_free_adminbar_chart()
+{
+    if (!isset($GLOBALS['vtrts_free_chart_data'])) return;
 
+    $chart_data = $GLOBALS['vtrts_free_chart_data'];
+    $data_points = [];
+
+    foreach ($chart_data['labels'] as $index => $label) {
+        $data_points[] = [
+            'label' => $label,
+            'y'     => isset($chart_data['data'][$index]) ? (int)$chart_data['data'][$index] : 0
+        ];
+    }
+?>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            const dataPoints = <?php echo json_encode($data_points, JSON_NUMERIC_CHECK); ?>;
+
+            function calculateYAxisSettings(dataPoints) {
+                if (!dataPoints || dataPoints.length === 0) {
+                    return {
+                        interval: 1,
+                        maximum: 10
+                    };
+                }
+
+                const values = dataPoints.map(point => point.y);
+                const minValue = Math.min(...values);
+                const maxValue = Math.max(...values);
+
+                if (maxValue <= 1) {
+                    return {
+                        interval: 1,
+                        maximum: null
+                    };
+                }
+
+                const range = maxValue - Math.max(0, minValue);
+                let interval;
+
+                if (range <= 10) interval = 1;
+                else if (range <= 50) interval = 5;
+                else if (range <= 100) interval = 10;
+                else if (range <= 500) interval = 25;
+                else if (range <= 1000) interval = 50;
+                else if (range <= 5000) interval = 100;
+                else interval = Math.ceil(range / 10);
+
+                return {
+                    interval: interval,
+                    maximum: null
+                };
+            }
+
+            const yAxisSettings = calculateYAxisSettings(dataPoints);
+
+            const chart = new CanvasJS.Chart("vtrtsFreeChart", {
+                backgroundColor: "#23282d",
+                animationEnabled: true,
+                width: 420,
+                height: 200,
+                axisX: {
+                    labelFontColor: "#ccc",
+                    lineColor: "#444",
+                    tickColor: "#444"
+                },
+                axisY: {
+                    labelFontColor: "#ccc",
+                    lineColor: "#444",
+                    tickColor: "#444",
+                    gridColor: "#444",
+                    includeZero: true,
+                    interval: yAxisSettings.interval,
+                    maximum: yAxisSettings.maximum,
+                    labelFormatter: function(e) {
+                        return Math.round(e.value);
+                    }
+                },
+                legend: {
+                    fontColor: "#fff",
+                    fontSize: 12,
+                    horizontalAlign: "center",
+                    verticalAlign: "bottom",
+                    dockInsidePlotArea: false
+                },
+                data: [{
+                    type: "line",
+                    name: "Visitors",
+                    showInLegend: true,
+                    markerType: "circle",
+                    markerSize: 8,
+                    markerColor: "#1DAE22",
+                    color: "#1DAE22",
+                    lineThickness: 2,
+                    dataPoints: dataPoints
+                }]
+            });
+
+            chart.render();
+        });
+    </script>
+    <?php
+}
 /**
  * Called when plugin is activated or upgraded
  *
@@ -205,16 +590,20 @@ function vtrts_free_add_items($admin_bar)
  */
 
 
-function ahcfree_localtime($dateformat)
+function ahcfree_localtime($format = 'Y-m-d H:i:s')
 {
-    if (function_exists('date_i18n')) {
+    $timezone_name = ahcfree_get_timezone_string();
 
-        return date_i18n($dateformat);
-    } else {
-        return gmdate($dateformat);
+    try {
+        $timezone = new DateTimeZone($timezone_name);
+        $datetime = new DateTime('now', $timezone);
+        return $datetime->format($format);
+    } catch (Exception $e) {
+        error_log('ahcfree_localtime error: ' . $e->getMessage());
+        $datetime = new DateTime('now', new DateTimeZone('UTC'));
+        return $datetime->format($format);
     }
 }
-
 
 
 function vtrts_free_remove_dokan_js_files()
@@ -428,33 +817,6 @@ function ahcfree_get_save_settings()
     return false;
 }
 
-function ahcfree_get_timezone_string()
-{
-    $custom_timezone = get_option('ahcfree_custom_timezone');
-    if (!$custom_timezone) {
-        $wsmTimeZone = get_option('timezone_string');
-        if (is_null($wsmTimeZone) || $wsmTimeZone == '') {
-            $wsmTimeZone = ahcfree_GetWPTimezoneString();
-        }
-        $custom_timezone = ahcfree_CleanupTimeZoneString($wsmTimeZone);
-
-        /*
-		$custom_timezone = get_option( 'timezone_string' );
-
-        if ( ! empty( $custom_timezone ) ) {
-            return $custom_timezone;
-        }
-
-        $offset  = get_option( 'gmt_offset' );
-        $hours   = (int) $offset;
-        $minutes = ( $offset - floor( $offset ) ) * 60;
-        if( $hours < 10 ){
-			$hours	= '0'+$hours;
-		}
-        echo $custom_timezone  = sprintf( '%s:%s', $hours, $minutes );*/
-    }
-    return $custom_timezone;
-}
 
 
 function ahcfree_CleanupTimeZoneString($tzString)
@@ -478,6 +840,29 @@ function ahcfree_CleanupTimeZoneString($tzString)
 }
 
 
+
+function ahcfree_get_timezone_string()
+{
+    // First, try the custom timezone option
+    $custom_timezone = get_option('ahcfree_custom_timezone');
+    if (!empty($custom_timezone) && in_array($custom_timezone, timezone_identifiers_list())) {
+        return $custom_timezone;
+    }
+
+    // Fallback to WordPress timezone_string
+    $wp_timezone = get_option('timezone_string');
+    if (!empty($wp_timezone) && in_array($wp_timezone, timezone_identifiers_list())) {
+        return $wp_timezone;
+    }
+
+    // Final fallback
+    return 'UTC';
+}
+
+
+/**
+ * Get WordPress timezone string with proper fallback (matches pro version)
+ */
 function ahcfree_GetWPTimezoneString()
 {
     // if site timezone string exists, return it
@@ -509,18 +894,18 @@ function ahcfree_GetWPTimezoneString()
     // fallback to UTC
     return 'UTC';
 }
-
 function ahcfree_get_current_timezone_offset()
 {
-    $tz = ahcfree_get_timezone_string();
+    $timezone_name = ahcfree_get_timezone_string();
+
     try {
-        $timeZone = new DateTimeZone($tz);
-        $date = new DateTime('now', $timeZone);
-        $date->setTimezone($timeZone);
+        $timezone = new DateTimeZone($timezone_name);
+        $datetime = new DateTime('now', $timezone);
+        return $datetime->format('P'); // Returns +03:00 format
     } catch (Exception $e) {
-        $date = new DateTime('now');
+        error_log('ahcfree_get_current_timezone_offset error: ' . $e->getMessage());
+        return '+00:00';
     }
-    return $date->format('P');
 }
 
 function ahcfree_last_hit_date()
@@ -765,6 +1150,7 @@ function ahcfree_enqueue_scripts()
 
     wp_localize_script('ahc_front_js', 'ahc_ajax_front', array(
         'ajax_url' => admin_url('admin-ajax.php'),
+        'plugin_url' => plugin_dir_url(__FILE__), // Add this line
         'page_id' => $post_id,
         'page_title' => $page_title,
         'post_type' => $post_type
@@ -1559,6 +1945,13 @@ function ahcfree_get_summary_statistics()
     $arr['month'] = ahcfree_get_visitors_visits_in_period('month');
     $arr['year'] = ahcfree_get_visitors_visits_in_period('year');
     $arr['total'] = ahcfree_get_visitors_visits_in_period();
+
+    // Add enhanced statistics for TOTAL only
+    $arr['total']['new_visitors'] = ahcfree_get_new_visitors_total();
+    $arr['total']['returning_visitors'] = ahcfree_get_returning_visitors_total();
+    $arr['total']['bounce_rate'] = ahcfree_get_bounce_rate_total();
+    $arr['total']['avg_session_duration'] = ahcfree_get_avg_session_duration_total();
+
     return $arr;
 }
 
@@ -1577,92 +1970,216 @@ function ahcfree_get_visitors_visits_in_period($period = 'total')
     global $wpdb;
     $custom_timezone_offset = ahcfree_get_current_timezone_offset();
     $custom_timezone = new DateTimeZone(ahcfree_get_timezone_string());
-    //	echo AHCFREE_SERVER_CURRENT_TIMEZONE;
 
     $current_date = new DateTime();
     $current_date->setTimezone($custom_timezone);
-
-
     $date = new DateTime();
     $date->setTimezone($custom_timezone);
 
+    $base_sql = "SELECT SUM(vst_visitors) AS vst_visitors, SUM(vst_visits) AS vst_visits
+                 FROM `ahc_visitors`
+                 WHERE site_id = %d";
 
-    $sql = "SELECT SUM(vst_visitors) AS vst_visitors, SUM(vst_visits) AS  vst_visits 
-			FROM `ahc_visitors` 
-			WHERE site_id = " . get_current_blog_id();
+    $site_id = get_current_blog_id();
     $results = false;
+
     switch ($period) {
         case 'today':
-
-
-            $sql .= " AND DATE(CONVERT_TZ(vst_date, '" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "')) = '" . ahcfree_localtime('Y-m-d') . "'";
-
+            $sql = $wpdb->prepare(
+                $base_sql . " AND DATE(CONVERT_TZ(vst_date, %s, %s)) = %s",
+                $site_id,
+                AHCFREE_SERVER_CURRENT_TIMEZONE,
+                $custom_timezone_offset,
+                ahcfree_localtime('Y-m-d')
+            );
             $results = $wpdb->get_results($sql, OBJECT);
             break;
 
         case 'yesterday':
             $date->modify('-1 day');
-            $sql .= " AND DATE(CONVERT_TZ(vst_date, '" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "')) = %s";
-            $results = $wpdb->get_results($wpdb->prepare($sql, $date->format('Y-m-d')), OBJECT);
+            $sql = $wpdb->prepare(
+                $base_sql . " AND DATE(CONVERT_TZ(vst_date, %s, %s)) = %s",
+                $site_id,
+                AHCFREE_SERVER_CURRENT_TIMEZONE,
+                $custom_timezone_offset,
+                $date->format('Y-m-d')
+            );
+            $results = $wpdb->get_results($sql, OBJECT);
             break;
 
         case 'week': // last 7 days
-            $limits = ahcfree_get_week_limits($date->format('Y-m-d'));
+            $end_date = $current_date->format('Y-m-d');
+            $start_date = $date->modify('-7 days')->format('Y-m-d');
 
-            $custom_timezone_offset = str_ireplace('+', '-', $custom_timezone_offset);
-
-            $sql .= "  AND vst_date >= DATE_FORMAT(CONVERT_TZ('" . $limits[0] . " 23:59:59','" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "'),'%Y-%m-%d %H:%i') - INTERVAL 1 DAY
-and vst_date < DATE_FORMAT(CONVERT_TZ('" . $limits[1] . " 00:00:00','" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "'),'%Y-%m-%d %H:%i') + INTERVAL 1 DAY";
-
-
-
-            $results = $wpdb->get_results($sql);
-
+            $sql = $wpdb->prepare(
+                $base_sql . " AND DATE(CONVERT_TZ(vst_date, %s, %s)) BETWEEN %s AND %s",
+                $site_id,
+                AHCFREE_SERVER_CURRENT_TIMEZONE,
+                $custom_timezone_offset,
+                $start_date,
+                $end_date
+            );
+            $results = $wpdb->get_results($sql, OBJECT);
             break;
 
         case 'month':
+            $end_date = $current_date->format('Y-m-d');
+            $start_date = $date->modify('-30 days')->format('Y-m-d');
 
-            $custom_timezone_offset = str_ireplace('+', '-', $custom_timezone_offset);
-
-            $sql .= "  AND vst_date >= DATE_FORMAT(CONVERT_TZ('" . $date->modify('-30 day')->format('Y-m-d') . " 23:59:59','" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "'),'%Y-%m-%d %H:%i') - INTERVAL 1 DAY
-and vst_date < DATE_FORMAT(CONVERT_TZ('" . $current_date->format('Y-m-d') . " 00:00:00','" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "'),'%Y-%m-%d %H:%i') + INTERVAL 1 DAY";
-
-
-
-            $results = $wpdb->get_results($sql);
-
-
-
-
+            $sql = $wpdb->prepare(
+                $base_sql . " AND DATE(CONVERT_TZ(vst_date, %s, %s)) BETWEEN %s AND %s",
+                $site_id,
+                AHCFREE_SERVER_CURRENT_TIMEZONE,
+                $custom_timezone_offset,
+                $start_date,
+                $end_date
+            );
+            $results = $wpdb->get_results($sql, OBJECT);
             break;
 
         case 'year':
+            $end_date = $current_date->format('Y-m-d');
+            $start_date = $date->modify('-365 days')->format('Y-m-d');
 
-
-            $custom_timezone_offset = str_ireplace('+', '-', $custom_timezone_offset);
-
-            $sql .= "  AND vst_date >= DATE_FORMAT(CONVERT_TZ('" . $date->modify('-365 day')->format('Y-m-d') . " 23:59:59','" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "'),'%Y-%m-%d %H:%i') - INTERVAL 1 DAY
-and vst_date < DATE_FORMAT(CONVERT_TZ('" . $current_date->format('Y-m-d') . " 00:00:00','" . AHCFREE_SERVER_CURRENT_TIMEZONE . "', '" . $custom_timezone_offset . "'),'%Y-%m-%d %H:%i') + INTERVAL 1 DAY";
-
-
-
-            $results = $wpdb->get_results($sql);
-
-
-
+            $sql = $wpdb->prepare(
+                $base_sql . " AND DATE(CONVERT_TZ(vst_date, %s, %s)) BETWEEN %s AND %s",
+                $site_id,
+                AHCFREE_SERVER_CURRENT_TIMEZONE,
+                $custom_timezone_offset,
+                $start_date,
+                $end_date
+            );
+            $results = $wpdb->get_results($sql, OBJECT);
             break;
 
         default:
+            $sql = $wpdb->prepare($base_sql, $site_id);
             $results = $wpdb->get_results($sql, OBJECT);
     }
-    //echo $wpdb->last_query.'<br />';
-    if ($results !== false) {
+
+    if ($results !== false && !empty($results)) {
         return array(
             'visitors' => (empty($results[0]->vst_visitors) ? 0 : $results[0]->vst_visitors),
             'visits' => (empty($results[0]->vst_visits) ? 0 : $results[0]->vst_visits)
         );
     } else {
-        return false;
+        return array('visitors' => 0, 'visits' => 0);
+    }
+}
+
+// Get total new visitors (all-time unique IPs) - FIXED: No prepare needed for simple query
+function ahcfree_get_new_visitors_total()
+{
+    global $wpdb;
+
+    // Count all unique IP addresses that have ever visited - no prepare needed
+    $sql = "SELECT COUNT(DISTINCT vtr_ip_address) as new_visitors FROM ahc_recent_visitors";
+
+    $result = $wpdb->get_var($sql);
+    return $result ? (int)$result : 0;
+}
+
+// Get total returning visitors (IPs with multiple visits on different dates)
+function ahcfree_get_returning_visitors_total()
+{
+    global $wpdb;
+    $custom_timezone_offset = ahcfree_get_current_timezone_offset();
+
+    // Count IP addresses that have visited on multiple different dates
+    $sql = $wpdb->prepare(
+        "SELECT COUNT(*) as returning_visitors
+        FROM (
+            SELECT vtr_ip_address
+            FROM ahc_recent_visitors
+            GROUP BY vtr_ip_address
+            HAVING COUNT(DISTINCT DATE(CONVERT_TZ(CONCAT(vtr_date, ' ', vtr_time), %s, %s))) > 1
+        ) as returning_ips",
+        AHCFREE_SERVER_CURRENT_TIMEZONE,
+        $custom_timezone_offset
+    );
+
+    $result = $wpdb->get_var($sql);
+    return $result ? (int)$result : 0;
+}
+
+// Calculate total bounce rate (all-time)
+function ahcfree_get_bounce_rate_total()
+{
+    global $wpdb;
+    $custom_timezone_offset = ahcfree_get_current_timezone_offset();
+
+    // Count sessions with only one page view (all-time)
+    $single_page_sessions = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) as single_sessions
+        FROM (
+            SELECT CONCAT(hit_ip_address, '-', DATE(CONVERT_TZ(CONCAT(hit_date, ' ', hit_time), %s, %s))) as session_id
+            FROM ahc_hits
+            GROUP BY session_id
+            HAVING COUNT(*) = 1
+        ) as single_session_data",
+        AHCFREE_SERVER_CURRENT_TIMEZONE,
+        $custom_timezone_offset
+    ));
+
+    // Get total sessions (all-time)
+    $total_sessions = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(DISTINCT CONCAT(hit_ip_address, '-', DATE(CONVERT_TZ(CONCAT(hit_date, ' ', hit_time), %s, %s)))) as total_sessions
+        FROM ahc_hits",
+        AHCFREE_SERVER_CURRENT_TIMEZONE,
+        $custom_timezone_offset
+    ));
+
+    if ($total_sessions > 0) {
+        return round(($single_page_sessions / $total_sessions) * 100, 1);
+    }
+
+    return 0;
+}
+
+// Calculate total average session duration (all-time)
+function ahcfree_get_avg_session_duration_total()
+{
+    global $wpdb;
+    $custom_timezone_offset = ahcfree_get_current_timezone_offset();
+
+    // Calculate average time between first and last hit per session (all-time)
+    $avg_duration = $wpdb->get_var($wpdb->prepare(
+        "SELECT AVG(session_duration) as avg_duration
+        FROM (
+            SELECT 
+                CONCAT(hit_ip_address, '-', DATE(CONVERT_TZ(CONCAT(hit_date, ' ', hit_time), %s, %s))) as session_id,
+                TIMESTAMPDIFF(SECOND, 
+                    MIN(CONVERT_TZ(CONCAT(hit_date, ' ', hit_time), %s, %s)), 
+                    MAX(CONVERT_TZ(CONCAT(hit_date, ' ', hit_time), %s, %s))
+                ) as session_duration
+            FROM ahc_hits
+            GROUP BY session_id
+            HAVING COUNT(*) > 1
+        ) as sessions",
+        AHCFREE_SERVER_CURRENT_TIMEZONE,
+        $custom_timezone_offset,
+        AHCFREE_SERVER_CURRENT_TIMEZONE,
+        $custom_timezone_offset,
+        AHCFREE_SERVER_CURRENT_TIMEZONE,
+        $custom_timezone_offset
+    ));
+
+    return $avg_duration ? round($avg_duration) : 0;
+}
+
+// Helper function to format session duration
+function ahcfree_format_duration($seconds)
+{
+    if ($seconds < 60) {
+        return $seconds . 's';
+    } elseif ($seconds < 3600) {
+        $minutes = floor($seconds / 60);
+        $remaining_seconds = $seconds % 60;
+        return $minutes . 'm ' . $remaining_seconds . 's';
+    } else {
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        return $hours . 'h ' . $minutes . 'm';
     }
 }
 
@@ -2439,7 +2956,7 @@ function ahcfree_get_latest_search_key_words_used($all, $cnt = true, $start = ''
                 $imgurl = plugins_url('images/flags/' . strtolower($re->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
                 $img .= '<img src="' . esc_url($imgurl) . '" border="0" width="22" height="18" title="' . esc_attr($re->ctr_name) . '" onerror="imgFlagError(this)" />';
             }
-            $img .= '&nbsp;' . esc_html($re->ctr_name) . '</span>';
+            //  $img .= '&nbsp;' . esc_html($re->ctr_name) . '</span>';
             /*$eurl=plugins_url('images/search_engines/' . $re->srh_icon, AHCFREE_PLUGIN_MAIN_FILE);
 			$img.='<span><img src="'.$eurl.'" border="0" width="22" height="22" title="'.$re->srh_name.'" /></span>';
 			
@@ -3037,8 +3554,11 @@ WHERE site_id = " . get_current_blog_id() . " and $cond GROUP BY $groupby";
             } else {
                 $cls = 'visitorsGraph';
             }
+
+            $per_val = ($per > 0) ? '' . ($per) . '%' : '';
+
             $css = (!empty($per)) ? 'style="width: ' . ceil($per) . '%;"' : '';
-            $arr[$j]['graph'] = '<div class="visitorsGraphContainer"><div class="' . esc_attr($cls) . '" ' . $css . '>&nbsp;</div><div class="cleaner"></div></div><div class="visitorsPercent">(' . ceil($per) . ')%</div>';
+            $arr[$j]['graph'] = '<div class="visitorsGraphContainer"><div class="' . esc_attr($cls) . '" ' . $css . '>&nbsp;' . $per_val . '</div><div class="cleaner"></div></div>';
             $j++;
             $cls = '';
             $per = 0;
@@ -3175,11 +3695,13 @@ function ahcfree_include_scripts()
 
 
     wp_enqueue_script('jquery-ui-datepicker', array('jquery'));
-    wp_register_script('ahc_main_js', plugins_url('js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), '', '2.5');
+    wp_register_script('ahc_main_js', plugins_url('js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), '', '3.0');
     wp_enqueue_script('ahc_main_js');
 
-    wp_localize_script('ahc_main_js', 'ahc_ajax', array('ajax_url' => admin_url('admin-ajax.php')));
-
+    wp_localize_script('ahc_main_js', 'ahc_ajax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'plugin_url' => plugin_dir_url(__FILE__)  // Add this line
+    ));
     wp_enqueue_script('sweetalert', plugins_url('js/sweetalert.min.js', AHCFREE_PLUGIN_MAIN_FILE));
     wp_enqueue_style('sweetalert', plugins_url('css/sweetalerts.css', AHCFREE_PLUGIN_MAIN_FILE));
 }
@@ -3236,7 +3758,144 @@ function ahcfree_vtrtsp_plugin_add_settings_link($links)
 }
 
 
+function ahcfree_get_traffic_sources_for_display($from_date = '', $to_date = '')
+{
+    global $wpdb;
 
+    // Build date condition
+    $date_condition_hits = '';
+    $date_condition_keywords = '';
+
+    if (!empty($from_date) && !empty($to_date)) {
+        $date_condition_hits = $wpdb->prepare(" AND hit_date BETWEEN %s AND %s", $from_date, $to_date);
+        $date_condition_keywords = $wpdb->prepare(" AND kwd_date BETWEEN %s AND %s", $from_date, $to_date);
+    } else {
+        // Default to last 30 days
+        $date_condition_hits = " AND hit_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        $date_condition_keywords = " AND kwd_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+    }
+
+    $traffic_sources = [];
+
+    // 1. Organic Search - Get from ahc_keywords table (this is where your search data actually is!)
+    $organic_search = $wpdb->get_results(
+        "SELECT 
+        COALESCE(se.srh_name, 'Unknown Search Engine') as srh_name,
+        COUNT(DISTINCT CONCAT(k.kwd_ip_address, '-', k.kwd_date)) as sessions
+     FROM ahc_keywords k
+     LEFT JOIN ahc_search_engines se ON k.srh_id = se.srh_id
+     WHERE k.site_id = " . get_current_blog_id() . "
+     {$date_condition_keywords}
+     GROUP BY k.srh_id, se.srh_name
+     ORDER BY sessions DESC"
+    );
+
+    foreach ($organic_search as $search) {
+        $traffic_sources[] = [
+            'name' => $search->srh_name,
+            'sessions' => intval($search->sessions),
+            'type' => 'Organic Search',
+            'icon' => '🔍'
+        ];
+    }
+
+    // 2. Direct Traffic - Traffic without referrer
+    $direct_traffic = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(DISTINCT CONCAT(hit_ip_address, '-', hit_date)) as sessions
+     FROM ahc_hits 
+     WHERE (hit_referer IS NULL OR hit_referer = '' OR hit_referer LIKE %s)
+     AND hit_ip_address NOT IN (
+         SELECT DISTINCT kwd_ip_address FROM ahc_keywords 
+         WHERE site_id = " . get_current_blog_id() . " {$date_condition_keywords}
+     )
+     {$date_condition_hits}",
+        '%' . get_site_url() . '%'
+    ));
+
+    if ($direct_traffic > 0) {
+        $traffic_sources[] = [
+            'name' => 'Direct Traffic',
+            'sessions' => intval($direct_traffic),
+            'type' => 'Direct',
+            'icon' => '🔗'
+        ];
+    }
+
+    // 3. Website Referrals - Exclude search engines and own site
+    $referral_traffic = $wpdb->get_results($wpdb->prepare(
+        "SELECT 
+        hit_referer_site,
+        COUNT(DISTINCT CONCAT(hit_ip_address, '-', hit_date)) as sessions
+     FROM ahc_hits 
+     WHERE hit_referer_site IS NOT NULL 
+       AND hit_referer_site != ''
+       AND hit_referer_site NOT LIKE %s
+       AND hit_referer_site NOT IN (
+           SELECT DISTINCT SUBSTRING_INDEX(SUBSTRING_INDEX(kwd_referer, '/', 3), '//', -1)
+           FROM ahc_keywords 
+           WHERE site_id = " . get_current_blog_id() . "
+       )
+     {$date_condition_hits}
+     GROUP BY hit_referer_site
+     ORDER BY sessions DESC
+     LIMIT 10",
+        '%' . parse_url(get_site_url(), PHP_URL_HOST) . '%'
+    ));
+
+    foreach ($referral_traffic as $referral) {
+        $clean_domain = str_replace('www.', '', $referral->hit_referer_site);
+        $traffic_sources[] = [
+            'name' => $clean_domain,
+            'sessions' => intval($referral->sessions),
+            'type' => 'Referral',
+            'icon' => '🌐'
+        ];
+    }
+
+    // 4. Social Media
+    $social_domains = ['facebook.com', 'twitter.com', 'x.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'tiktok.com'];
+    if (!empty($social_domains)) {
+        $social_conditions = array_map(function ($domain) use ($wpdb) {
+            return $wpdb->prepare("hit_referer_site LIKE %s", '%' . $domain . '%');
+        }, $social_domains);
+        $social_condition = "(" . implode(" OR ", $social_conditions) . ")";
+
+        $social_traffic = $wpdb->get_results(
+            "SELECT 
+            hit_referer_site,
+            COUNT(DISTINCT CONCAT(hit_ip_address, '-', hit_date)) as sessions
+         FROM ahc_hits 
+         WHERE {$social_condition}
+         {$date_condition_hits}
+         GROUP BY hit_referer_site
+         ORDER BY sessions DESC"
+        );
+
+        foreach ($social_traffic as $social) {
+            $clean_domain = str_replace('www.', '', $social->hit_referer_site);
+            $traffic_sources[] = [
+                'name' => $clean_domain,
+                'sessions' => intval($social->sessions),
+                'type' => 'Social Media',
+                'icon' => '📱'
+            ];
+        }
+    }
+
+    // Sort by sessions and add rank and percentage
+    usort($traffic_sources, function ($a, $b) {
+        return $b['sessions'] - $a['sessions'];
+    });
+
+    $total_sessions = array_sum(array_column($traffic_sources, 'sessions'));
+
+    foreach ($traffic_sources as $index => &$source) {
+        $source['rank'] = $index + 1;
+        $source['percent'] = $total_sessions > 0 ? round(($source['sessions'] / $total_sessions) * 100, 1) : 0;
+    }
+
+    return $traffic_sources;
+}
 
 
 function ahcfree_get_hits_by_custom_duration_callback()
@@ -3571,41 +4230,347 @@ function ahcfree_traffic_by_countries_callback()
         exit;
     }
 }
-
-add_action("wp_ajax_recent_visitor_by_ip", "ahcfree_recent_visitor_by_ip_callback");
-function ahcfree_recent_visitor_by_ip_callback()
+// Fixed callback function - handles both GET and POST parameters properly
+// Enhanced callback function with original data processing
+add_action("wp_ajax_recent_visitor_by_ip", "ahcfree_recent_visitor_by_ip_callback_optimized");
+function ahcfree_recent_visitor_by_ip_callback_optimized()
 {
     if (!is_user_logged_in() || !current_user_can('manage_options')) {
         die('you don\'t have permission to access this resource');
     }
 
-    if (isset($_REQUEST['page']) && $_REQUEST['page'] == "all") {
+    $all = (isset($_REQUEST['page']) && $_REQUEST['page'] == 'all') ? 1 : 0;
 
-        $ip = ahc_free_sanitize_text_or_array_field($_REQUEST['ip']);
-        $fdt = ahc_free_sanitize_text_or_array_field($_REQUEST['fdt']);
-        $tdt = ahc_free_sanitize_text_or_array_field($_REQUEST['tdt']);
+    // Enhanced: Handle both GET (DataTables) and POST (form) parameters
+    $search_from_date = '';
+    $search_to_date = '';
+    $search_ip = '';
 
-        $res = ahcfree_get_recent_visitors(1, false, "", "", $fdt, $tdt, $ip);
-        echo json_encode($res);
-        exit;
-    } else {
-        $ip = ahc_free_sanitize_text_or_array_field($_REQUEST['ip']);
-        $fdt = ahc_free_sanitize_text_or_array_field($_REQUEST['fdt']);
-        $tdt = ahc_free_sanitize_text_or_array_field($_REQUEST['tdt']);
-        $start = ahc_free_sanitize_text_or_array_field($_REQUEST['start']);
-        $length = ahc_free_sanitize_text_or_array_field($_REQUEST['length']);
-
-        $cnt = ahcfree_get_recent_visitors("", true, "", "", $fdt, $tdt, $ip);
-        $recentVisitors = ahcfree_get_recent_visitors("", false, $start, $length, $fdt, $tdt, $ip);
-
-
-        $arr["draw"] = 0;
-        $arr["recordsTotal"] = $cnt;
-        $arr["recordsFiltered"] = $cnt;
-        $arr['data'] = $recentVisitors;
-        echo json_encode($arr);
-        exit;
+    // Check GET parameters first (DataTables AJAX)
+    if (isset($_GET['from_date']) && !empty($_GET['from_date'])) {
+        $search_from_date = sanitize_text_field($_GET['from_date']);
     }
+    if (isset($_GET['to_date']) && !empty($_GET['to_date'])) {
+        $search_to_date = sanitize_text_field($_GET['to_date']);
+    }
+    if (isset($_GET['ip']) && !empty($_GET['ip'])) {
+        $search_ip = sanitize_text_field($_GET['ip']);
+    }
+
+    // Fallback to REQUEST parameters
+    if (empty($search_from_date) && isset($_REQUEST['from_date'])) {
+        $search_from_date = sanitize_text_field($_REQUEST['from_date']);
+    }
+    if (empty($search_to_date) && isset($_REQUEST['to_date'])) {
+        $search_to_date = sanitize_text_field($_REQUEST['to_date']);
+    }
+    if (empty($search_ip) && isset($_REQUEST['ip'])) {
+        $search_ip = sanitize_text_field($_REQUEST['ip']);
+    }
+
+    // Also check POST data for form submissions (backward compatibility)
+    if (isset($_POST['ip_addr']) && !empty($_POST['ip_addr'])) {
+        $search_ip = sanitize_text_field($_POST['ip_addr']);
+    }
+    if (isset($_POST['r_from_dt']) && !empty($_POST['r_from_dt'])) {
+        $search_from_date = sanitize_text_field($_POST['r_from_dt']);
+    }
+    if (isset($_POST['r_to_dt']) && !empty($_POST['r_to_dt'])) {
+        $search_to_date = sanitize_text_field($_POST['r_to_dt']);
+    }
+
+    // Get pagination parameters
+    $start = isset($_REQUEST['start']) ? intval($_REQUEST['start']) : 0;
+    $length = isset($_REQUEST['length']) ? intval($_REQUEST['length']) : 10;
+
+    // Get count and data
+    $cnt = ahcfree_get_recent_visitors_with_date_range($all, true, "", "", $search_from_date, $search_to_date, $search_ip);
+    $recentVisitors = ahcfree_get_recent_visitors_with_date_range($all, false, $start, $length, $search_from_date, $search_to_date, $search_ip);
+
+    $arr = array();
+    $arr["draw"] = isset($_REQUEST['draw']) ? intval($_REQUEST['draw']) : 0;
+    $arr["recordsTotal"] = $cnt;
+    $arr["recordsFiltered"] = $cnt;
+    $arr['data'] = $recentVisitors ? $recentVisitors : array();
+
+    // Set proper headers
+    header('Content-Type: application/json');
+    echo json_encode($arr);
+    wp_die();
+}
+
+// Enhanced date range function with complete original data processing
+function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start = '', $limit = '', $from_date = '', $to_date = '', $ip = '')
+{
+    global $wpdb;
+    $cond = "";
+    $date_cond = "";
+
+    // Enhanced: Better date parsing to handle multiple formats
+    if (!empty($from_date) && !empty($to_date)) {
+        // Parse dates more robustly
+        $fromdt = ahcfree_parse_date($from_date);
+        $todt = ahcfree_parse_date($to_date);
+
+        if ($fromdt && $todt) {
+            $date_cond = " AND DATE(vtr_date) BETWEEN '$fromdt' AND '$todt'";
+        }
+    } elseif (!empty($from_date) && empty($to_date)) {
+        $fromdt = ahcfree_parse_date($from_date);
+        if ($fromdt) {
+            $date_cond = " AND DATE(vtr_date) >= '$fromdt'";
+        }
+    } elseif (empty($from_date) && !empty($to_date)) {
+        $todt = ahcfree_parse_date($to_date);
+        if ($todt) {
+            $date_cond = " AND DATE(vtr_date) <= '$todt'";
+        }
+    } else {
+        // No dates provided - show last 30 days
+        $end_date = date('Y-m-d');
+        $start_date = date('Y-m-d', strtotime('-30 days'));
+        $date_cond = " AND DATE(vtr_date) BETWEEN '$start_date' AND '$end_date'";
+    }
+
+    // Handle IP filtering
+    if (!empty($ip)) {
+        $ip = sanitize_text_field($ip);
+        $cond .= " AND vtr_ip_address LIKE '" . esc_sql($ip) . "%'";
+    }
+
+    $site_id = get_current_blog_id();
+
+    if ($cnt == true) {
+        $sql_query = "SELECT COUNT(DISTINCT vtr_ip_address, DATE(vtr_date)) as cnt 
+                     FROM `ahc_recent_visitors` 
+                     WHERE site_id = $site_id 
+                     AND vtr_ip_address NOT LIKE 'UNKNOWN%' 
+                     $cond $date_cond";
+
+        $count = $wpdb->get_row($sql_query);
+        return $count ? $count->cnt : 0;
+    }
+
+    $limitCond = "";
+    if ($start !== '' && $limit !== '') {
+        $limitCond = " LIMIT " . intval($start) . ", " . intval($limit);
+    }
+
+    if ($all == 1) {
+        $limitCond = "";
+    }
+
+    $sql_query = "SELECT 
+        v.vtr_id,
+        v.vtr_ip_address,
+        v.vtr_referer,
+        DATE(v.vtr_date) as vtr_date,
+        TIME(v.vtr_time) as vtr_time,
+        v.ahc_city,
+        v.ahc_region,
+        c.ctr_name,
+        c.ctr_internet_code,
+        b.bsr_name,
+        b.bsr_icon,
+        COALESCE(hits_data.hit_count, 1) as day_hits2,
+        COALESCE(hits_data.duration_seconds, 1) as duration_seconds
+    FROM (
+        SELECT DISTINCT 
+            vtr_ip_address, 
+            DATE(vtr_date) as visit_date,
+            MIN(vtr_id) as min_id
+        FROM `ahc_recent_visitors` 
+        WHERE site_id = $site_id 
+        AND vtr_ip_address NOT LIKE 'UNKNOWN%' 
+        $cond $date_cond
+        GROUP BY vtr_ip_address, DATE(vtr_date)
+        ORDER BY min_id DESC
+        $limitCond
+    ) unique_visits
+    JOIN `ahc_recent_visitors` v ON v.vtr_ip_address = unique_visits.vtr_ip_address 
+        AND DATE(v.vtr_date) = unique_visits.visit_date
+        AND v.vtr_id = unique_visits.min_id
+    LEFT JOIN `ahc_countries` c ON v.ctr_id = c.ctr_id
+    LEFT JOIN `ahc_browsers` b ON v.bsr_id = b.bsr_id
+    LEFT JOIN (
+        SELECT 
+            hit_ip_address,
+            DATE(hit_date) as hit_date,
+            COUNT(*) as hit_count,
+            GREATEST(1, TIMESTAMPDIFF(SECOND, 
+                MIN(CONCAT(hit_date, ' ', hit_time)), 
+                MAX(CONCAT(hit_date, ' ', hit_time))
+            )) as duration_seconds
+        FROM `ahc_hits` 
+        WHERE site_id = $site_id
+        AND hit_page_title != ''
+        GROUP BY hit_ip_address, DATE(hit_date)
+    ) hits_data ON hits_data.hit_ip_address = v.vtr_ip_address 
+        AND hits_data.hit_date = DATE(v.vtr_date)
+    ORDER BY v.vtr_id DESC";
+
+    $results = $wpdb->get_results($sql_query);
+
+    if ($results !== false) {
+        $arr = array();
+        $new = array();
+        $c = 0;
+
+        if (is_array($results)) {
+            foreach ($results as $hit) {
+                // Skip invalid IPs
+                if (strlen($hit->vtr_ip_address) >= 17) {
+                    continue;
+                }
+
+                $visitDate = new DateTime($hit->vtr_date . ' ' . $hit->vtr_time);
+
+                // Process referer
+                $hit_referer = '';
+                if ($hit->vtr_referer) {
+                    $parsed_host = parse_url($hit->vtr_referer, PHP_URL_HOST);
+                    $server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
+                    if ($parsed_host != $server_name) {
+                        $hit_referer = rawurldecode($hit->vtr_referer);
+                    }
+                }
+
+                $hitip = '';
+                if (!empty($hit_referer)) {
+                    $hitip = '<a href="' . esc_url($hit_referer) . '" target="_blank">' .
+                        '<img src="' . esc_url(plugins_url('images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) . '" ' .
+                        'title="Referring url" width="16" height="16"></a>';
+                }
+
+                // Process IP address
+                $display_ip = $hit->vtr_ip_address;
+                if (get_option('ahcfree_ahcfree_haships') == '1') {
+                    $display_ip = ahcfree_haship($hit->vtr_ip_address);
+                }
+
+                $arr[$c]['hit_id'] = $hit->vtr_id;
+                $arr[$c]['hit_ip_address'] = $display_ip . "&nbsp;" . $hitip;
+
+                // Process country flag
+                $img = "";
+                if ($hit->ctr_internet_code != '') {
+                    $imgurl = plugins_url('images/flags/' . strtolower($hit->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
+                    $img = "<img src='" . esc_url($imgurl) . "' border='0' width='22' height='18' " .
+                        "title='" . esc_attr($hit->ctr_name) . "' onerror='imgFlagError(this)' />&nbsp;";
+                }
+
+                $arr[$c]['hit_date'] = $hit->vtr_date;
+                $arr[$c]['hit_time'] = $hit->vtr_time;
+                $arr[$c]['ctr_internet_code'] = $hit->ctr_internet_code;
+                $arr[$c]['bsr_name'] = $hit->bsr_name;
+                $arr[$c]['bsr_icon'] = $hit->bsr_icon;
+
+                // Process city and region
+                $city = (strpos($hit->ahc_city, 'charset') !== false) ? '-' : $hit->ahc_city;
+                $region = (strpos($hit->ahc_region, '}') !== false) ? '-' : $hit->ahc_region;
+
+                $arr[$c]['ahc_region'] = $region;
+                $arr[$c]['ahc_city'] = $city;
+
+                // Build location string
+                $location_parts = array();
+                if ($hit->ctr_name) $location_parts[] = $hit->ctr_name;
+                if ($city && $city != '-') $location_parts[] = $city;
+                if ($region && $region != '-') $location_parts[] = $region;
+
+                $arr[$c]['ctr_name'] = $img . implode(', ', $location_parts);
+                $arr[$c]['time'] = $visitDate->format('d M Y @ h:i a');
+
+                // Format duration
+                $duration_seconds = max(1, intval($hit->duration_seconds));
+                $hours = floor($duration_seconds / 3600);
+                $minutes = floor(($duration_seconds % 3600) / 60);
+                $seconds = $duration_seconds % 60;
+                $duration_str = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+
+                $arr[$c]['duration'] = $duration_str;
+
+                // Create the day hits button with proper data attributes
+                $arr[$c]['day_hits'] = '<button style="background-color: #4CAF50; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px;" 
+                    data-hitdate="' . esc_attr($hit->vtr_date) . '" 
+                    data-hitipaddress="' . esc_attr($hit->vtr_ip_address) . '" 
+                    data-hitcountry="' . esc_attr(implode(', ', $location_parts)) . '" 
+                    data-toggle="modal" 
+                    data-target="#DayHitsModal">' . intval($hit->day_hits2) . '</button>';
+
+                if ($all == 1) {
+                    $new[$c]['hit_ip_address'] = $hit->vtr_ip_address;
+                    $new[$c]['ctr_name'] = implode(', ', $location_parts);
+                    $new[$c]['time'] = $visitDate->format('d M Y @ h:i a');
+                    $new[$c]['day_hits'] = ($hit->day_hits2 > 0) ? $hit->day_hits2 : '1';
+                    $new[$c]['duration'] = $duration_str;
+                }
+
+                $c++;
+            }
+        }
+
+        if ($all == 1) {
+            return $new;
+        }
+        return $arr;
+    } else {
+        return false;
+    }
+}
+
+// Enhanced helper function for robust date parsing
+function ahcfree_parse_date($date_string)
+{
+    if (empty($date_string)) {
+        return false;
+    }
+
+    // Try different date formats
+    $formats = array(
+        'Y-m-d',     // 2025-06-01
+        'm-d-Y',     // 06-01-2025
+        'd-m-Y',     // 01-06-2025
+        'Y/m/d',     // 2025/06/01
+        'm/d/Y',     // 06/01/2025
+        'd/m/Y'      // 01/06/2025
+    );
+
+    foreach ($formats as $format) {
+        $date = DateTime::createFromFormat($format, $date_string);
+        if ($date !== false) {
+            return $date->format('Y-m-d');
+        }
+    }
+
+    // Fallback to strtotime
+    $timestamp = strtotime($date_string);
+    if ($timestamp !== false) {
+        return date('Y-m-d', $timestamp);
+    }
+
+    return false;
+}
+
+// Simplified AJAX handler for visitor info (unchanged)
+add_action("wp_ajax_ahcfree_get_visitor_info", "ahcfree_get_visitor_info_callback_optimized");
+function ahcfree_get_visitor_info_callback_optimized()
+{
+    if (!is_user_logged_in() || !current_user_can('manage_options')) {
+        wp_die('Unauthorized');
+    }
+
+    $ip = sanitize_text_field($_POST['hitipaddress']);
+    $hitdate = sanitize_text_field($_POST['hitdate']);
+
+    // Since we already have basic browser info, just return it
+    // This is mainly for consistency with the existing modal structure
+    $response = array(
+        'browser' => sanitize_text_field($_POST['browser']) ?: 'Unknown Browser',
+        'os' => 'Unknown OS' // You can enhance this if you have OS data
+    );
+
+    wp_send_json($response);
 }
 add_action("wp_ajax_latest_search_words", "ahcfree_latest_search_words_callback");
 function ahcfree_latest_search_words_callback()

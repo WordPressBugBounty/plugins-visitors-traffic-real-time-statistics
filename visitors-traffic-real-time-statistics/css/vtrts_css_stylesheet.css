@@ -176,9 +176,9 @@ float:left;
 
 /* visitors graph begin */
 div.visitorsGraphContainer{float: left; width: 70%} /* ### */
-div.visitorsGraphContainer div.visitorsGraph{float: left; background-color:#9F6; border-radius: 2px;}
-div.visitorsGraphContainer div.visitorsGraph2{float: left; background-color:#393; border-radius: 2px;}
-div.visitorsGraphContainer div.visitorsGraph3{float: left; background-color:#060; border-radius: 2px;}
+div.visitorsGraphContainer div.visitorsGraph{float: left; background-color:#afe5cc; border-radius: 2px;}
+div.visitorsGraphContainer div.visitorsGraph2{float: left; background-color:#6ab894; border-radius: 2px;}
+div.visitorsGraphContainer div.visitorsGraph3{float: left; background-color:#469e75; border-radius: 2px;}
 div.visitorsPercent{float: left; width: 25%; margin-left: 5px;} /* ### */
 /* visitors graph end */
 

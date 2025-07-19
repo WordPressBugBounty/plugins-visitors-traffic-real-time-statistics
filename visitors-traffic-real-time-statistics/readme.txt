@@ -2,8 +2,8 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 6.7.2
-Stable tag: 8.2
+Tested up to: 6.8.2
+Stable tag: 8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ This plugin will help you to track your visitors, browsers, operating systems, v
 
 == Description ==
 
-# 📊 <strong>Visitor Traffic Real-Time Statistics for WordPress</strong>
+# <strong>Visitor Traffic Real-Time Statistics for WordPress</strong>
 
 Unlock powerful insights into your website traffic with<strong>Visitor Traffic Real-Time Statistics</strong>, the ultimate WordPress plugin for tracking visitors, visits, browsers, operating systems, and more — all in one intuitive dashboard. 
 
@@ -19,17 +19,17 @@ With real-time data and easy-to-use shortcodes, you’ll get a complete picture 
 
 ---
 
-### 🚀<strong>Why Choose Visitor Traffic Real-Time Statistics?</strong>
+### <strong>Why Choose Visitor Traffic Real-Time Statistics?</strong>
 
-- 🟢<strong>Real-Time Visitor Tracking:</strong> See who’s visiting your site and when — in real-time.  
-- 🟢<strong>User-Friendly Dashboard:</strong> All your key insights are displayed on a single, easy-to-navigate dashboard.  
-- 🟢<strong>Comprehensive Analytics:</strong> Track visitors by country, device, browser, operating system, referrer, and more.  
-- 🟢<strong>Shortcode Integration:</strong> Display visitor stats anywhere on your site with simple shortcodes.  
-- 🟢<strong>SEO Insights:</strong> Monitor keywords, search engine referrals, and traffic sources to improve your SEO performance.  
+- <strong>Real-Time Visitor Tracking:</strong> See who’s visiting your site and when — in real-time.  
+- <strong>User-Friendly Dashboard:</strong> All your key insights are displayed on a single, easy-to-navigate dashboard.  
+- <strong>Comprehensive Analytics:</strong> Track visitors by country, device, browser, operating system, referrer, and more.  
+- <strong>Shortcode Integration:</strong> Display visitor stats anywhere on your site with simple shortcodes.  
+- <strong>SEO Insights:</strong> Monitor keywords, search engine referrals, and traffic sources to improve your SEO performance.  
 
 ---
 
-### 📊<strong>Available Shortcodes (Simple & Flexible)</strong>  
+### <strong>Available Shortcodes (Simple & Flexible)</strong>  
 
 Add these shortcodes to any post, page, or widget to showcase your traffic stats:
 
@@ -42,48 +42,48 @@ Add these shortcodes to any post, page, or widget to showcase your traffic stats
 
 ---
 
-## 🆓<strong>Free Version Features:</strong>
+## <strong>Free Version Features:</strong>
 
-- ✔️ Real-time visitor tracking and stats.  
-- ✔️ Insights into browsers, countries, hits, referrals, and searches.  
-- ✔️ Track daily, weekly, and monthly visitor trends.  
-- ✔️ Shortcodes to display key stats on your site.  
-- ✔️ Track top referring websites and keywords.  
+-  Real-time visitor tracking and stats.  
+-  Insights into browsers, countries, hits, referrals, and searches.  
+-  Track daily, weekly, and monthly visitor trends.  
+-  Shortcodes to display key stats on your site.  
+-  Track top referring websites and keywords.  
 
 ---
 
-## 🔥<strong>Upgrade to Pro for Even More Power!</strong>
+## <strong>Upgrade to Pro for Even More Power!</strong>
 
 Take your analytics to the next level with<strong>Visitor Traffic Real-Time Statistics Pro</strong>:
 
-- 🚀<strong>Multisite Support:</strong> Track traffic across multiple sites in one place.  
-- 🚀<strong>Live User Tracking:</strong> See how many people are online right now.  
-- 🌎<strong>Interactive Google Maps:</strong> Visualize visitor locations globally.  
-- 📊<strong>Advanced Page Tracking:</strong> Identify your most popular posts and pages.  
-- 📈<strong>Detailed Visit Graphs:</strong> Analyze visitor activity by the hour.  
-- 🔍<strong>Advanced SEO Insights:</strong> Discover the keywords driving traffic to your site.  
-- 🖨️<strong>Customizable Reports:</strong> Get actionable insights with easy-to-read reports.  
+- <strong>Multisite Support:</strong> Track traffic across multiple sites in one place.  
+- <strong>Live User Tracking:</strong> See how many people are online right now.  
+- <strong>Interactive Google Maps:</strong> Visualize visitor locations globally.  
+- <strong>Advanced Page Tracking:</strong> Identify your most popular posts and pages.  
+- <strong>Detailed Visit Graphs:</strong> Analyze visitor activity by the hour.  
+- <strong>Advanced SEO Insights:</strong> Discover the keywords driving traffic to your site.  
+- <strong>Customizable Reports:</strong> Get actionable insights with easy-to-read reports.  
 
 ---
 
-### 🌍<strong>Who Can Benefit?</strong>
+### <strong>Who Can Benefit?</strong>
 
-- 👨‍💻 Bloggers who want to track reader engagement.  
-- 🛒 E-commerce store owners looking to understand customer behavior.  
-- 📈 Marketers seeking to optimize SEO strategies.  
-- ⚙️ Website administrators who need detailed traffic analysis.  
+-  Bloggers who want to track reader engagement.  
+-  E-commerce store owners looking to understand customer behavior.  
+-  Marketers seeking to optimize SEO strategies.  
+-  Website administrators who need detailed traffic analysis.  
 
 ---
 
-## ✅<strong>Get Started Today!</strong>
+## <strong>Get Started Today!</strong>
 
-🎯<strong>Install the plugin now</strong> to gain valuable insights into your site traffic and grow your online presence.
+<strong>Install the plugin now</strong> to gain valuable insights into your site traffic and grow your online presence.
 
-🔗<strong>[Go PRO Now](https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/#gopro)</strong> to unlock all premium features and maximize your analytics potential!  
+<strong>[Go PRO Now](https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/#gopro)</strong> to unlock all premium features and maximize your analytics potential!  
 
-💬<strong>[Visit Our Support Center](https://www.wp-buy.com/support-center/)</strong> for any assistance.  
+<strong>[Visit Our Support Center](https://www.wp-buy.com/support-center/)</strong> for any assistance.  
 
-</strong>📢 Your website is getting visitors. Don’t miss out on the insights that can help your business grow.</strong> 🚀
+</strong>Your website is getting visitors. Don’t miss out on the insights that can help your business grow.</strong> 
 
 == Installation ==
 1. Download the package.
@@ -182,6 +182,13 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.3 =
+1. Bug fixes
+2. Top bar widget
+3. Page and post statistics
+4. Addition of new statistics and reports
+5. Enhancements to existing reports
 
 = 8.2 =
 1. CSS Bug fixes.

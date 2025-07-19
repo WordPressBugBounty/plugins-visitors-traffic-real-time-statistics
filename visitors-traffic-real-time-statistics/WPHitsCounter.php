@@ -359,34 +359,38 @@ class WPHitsCounter
 
 	protected function getCountryInternetCode()
 	{
-
 		if (!$this->ipIsUnknown) {
 
+			// First try: ipinfo.io (50,000 requests/month free, no key needed)
+			$ip_data = ahcfree_advanced_get_link("https://ipinfo.io/" . $this->ipAddress . "/country");
+			if ($ip_data && is_string($ip_data) && strlen(trim($ip_data)) == 2) {
+				$this->countryInternetCode = trim($ip_data);
+				return;
+			}
+
+			// Fallback: ipapi.co (30,000 requests/month free, no key needed)
+			$ip_data = ahcfree_advanced_get_link("https://ipapi.co/" . $this->ipAddress . "/country/");
+			if ($ip_data && is_string($ip_data) && strlen(trim($ip_data)) == 2) {
+				$this->countryInternetCode = trim($ip_data);
+				return;
+			}
+
+			// Last resort: Your original APIs
 			$ip_data = ahcfree_advanced_get_link("http://ip-api.com/json/" . $this->ipAddress);
-
-
 			$countryCode = isset($ip_data->countryCode) ? $ip_data->countryCode : '';
-
 			if (trim($countryCode) != '' && strlen($countryCode) == 2) {
-				$this->countryInternetCode  =  $countryCode;
+				$this->countryInternetCode = $countryCode;
 			} else {
-
 				$ip_data = ahcfree_advanced_get_link("https://geoip-db.com/json/" . $this->ipAddress);
-
-				$ahc_city =  isset($ip_data->city) ? $ip_data->city : '';
-				$ahc_region =  isset($ip_data->state) ? $ip_data->state : '';
 				$this->countryInternetCode = isset($ip_data->country_code) ? $ip_data->country_code : '';
-
 				if (empty($ip_data->country_code)) {
-					$ip_data = (ahcfree_advanced_get_link("http://www.geoplugin.net/json.gp?ip=" . $this->ipAddress));
-
+					$ip_data = ahcfree_advanced_get_link("http://www.geoplugin.net/json.gp?ip=" . $this->ipAddress);
 					$this->countryInternetCode = isset($ip_data->geoplugin_countryCode) ? $ip_data->geoplugin_countryCode : '';
 				}
 			}
 		}
 
 		if (empty($this->countryInternetCode)) {
-
 			$this->countryInternetCode = 'XX';
 		}
 	}
@@ -588,24 +592,30 @@ class WPHitsCounter
 	 * @return boolean
 
 	 */
-	protected function cleanHitsTable()
+	public function cleanHitsTable()
 	{
-
 		global $wpdb;
 
-		$sql = "DELETE FROM ahc_online_users WHERE DATE(`date`) <> '" . gmdate("Y-m-d") . "'";
-		$wpdb->query($sql);
+		// Get current time using saved timezone and calculate 90 days ago
+		$current_time = $this->getCurrentLocalTime();
 
-		$sql = "DELETE FROM `ahc_hits` WHERE DATE(`hit_date`) <> '" . gmdate("Y-m-d") . "'";
-
-
-		if ($wpdb->query($sql) !== false) {
-
-			return true;
-		} else {
-
-			return false;
+		try {
+			$timezone = new DateTimeZone($current_time['timezone']);
+			$datetime = new DateTime('now', $timezone);
+			$datetime->modify('-90 days');
+			$threshold_date = $datetime->format('Y-m-d H:i:s');
+		} catch (Exception $e) {
+			// Fallback calculation using saved timezone
+			$threshold_date = date('Y-m-d H:i:s', strtotime('-90 days'));
 		}
+
+		// Delete from ahc_online_users where date is older than 90 days
+		$sql1 = $wpdb->prepare("DELETE FROM ahc_online_users WHERE `date` < %s", $threshold_date);
+		$wpdb->query($sql1);
+
+		// Delete from ahc_hits where hit_date is older than 90 days
+		$sql2 = $wpdb->prepare("DELETE FROM `ahc_hits` WHERE `hit_date` < %s", $threshold_date);
+		return ($wpdb->query($sql2) !== false);
 	}
 
 	//--------------------------------------------
@@ -698,36 +708,30 @@ class WPHitsCounter
 	 */
 	protected function updateSearchingVisits($srh_id)
 	{
-
 		global $wpdb;
 
-		$custom_timezone_offset = ahcfree_get_current_timezone_offset();
+		// Get current time using saved timezone
+		$current_time = $this->getCurrentLocalTime();
+		$custom_timezone_offset = ahcpro_get_current_timezone_offset();
 
-		$sql = "SELECT vtsh_id FROM `ahc_searching_visits` WHERE site_id = %d AND srh_id = %d AND DATE(vtsh_date) = '" . gmdate("Y-m-d") . "'";
-		//$sql = "SELECT vtsh_id FROM `ahc_searching_visits` WHERE srh_id = %d AND DATE(CONVERT_TZ(vtsh_date,'" . AHCFREE_SERVER_CURRENT_TIMEZONE . "','" . $custom_timezone_offset . "')) = DATE(CONVERT_TZ(NOW( ),'" . AHCFREE_SERVER_CURRENT_TIMEZONE . "','" . $custom_timezone_offset . "'))";
+		$sql = "SELECT vtsh_id FROM `ahc_searching_visits` WHERE site_id = %d AND srh_id = %d AND DATE(vtsh_date) = '" . $current_time['date'] . "'";
 
 		$result = $wpdb->get_results($wpdb->prepare($sql, get_current_blog_id(), $srh_id), OBJECT);
 
 		if ($result !== false) {
-
 			if ($wpdb->num_rows > 0) {
-
 				$sql2 = "UPDATE `ahc_searching_visits` SET vtsh_visits = vtsh_visits + 1 WHERE vtsh_id = %d and site_id=%d";
-
 				return ($wpdb->query($wpdb->prepare($sql2, $result[0]->vtsh_id, get_current_blog_id())) !== false);
 			} else {
-
 				$sql2 = "INSERT INTO `ahc_searching_visits` (srh_id, vtsh_date, vtsh_visits,site_id) 
-
-						VALUES (%d, %s, 1,%d)";
-
-				return ($wpdb->query($wpdb->prepare($sql2, $srh_id, gmdate("Y-m-d H:i:s"), get_current_blog_id())) !== false);
+                    VALUES (%d, %s, 1,%d)";
+				return ($wpdb->query($wpdb->prepare($sql2, $srh_id, $current_time['full'], get_current_blog_id())) !== false); // FIXED: Use saved timezone
 			}
 		} else {
-
 			return false;
 		}
 	}
+
 
 	//--------------------------------------------
 
@@ -752,20 +756,17 @@ class WPHitsCounter
 	 */
 	protected function updateVisitors($visitors = 0, $visits = 0)
 	{
-
 		global $wpdb;
 
+		// Get current time using saved timezone
+		$current_time = $this->getCurrentLocalTime();
 
 		$sql = "INSERT INTO `ahc_daily_visitors_stats` (vst_date, vst_visitors, vst_visits,site_id) values(%s, %d, %d, %d )";
+		$wpdb->query($wpdb->prepare($sql, $current_time['full'], $visitors, $visits, get_current_blog_id())); // FIXED: Use saved timezone
 
-		$wpdb->query($wpdb->prepare($sql, gmdate("Y-m-d H:i:s"), $visitors, $visits, get_current_blog_id()));
-
-		$sql = "INSERT INTO `ahc_visitors` (vst_date, vst_visitors, vst_visits,site_id) values(%s, %d, %d, %d)";
-		//$sql = "UPDATE `ahc_visitors` SET vst_visitors = vst_visitors + %d, vst_visits = vst_visits + %d WHERE DATE(vst_date) = DATE(NOW())";
-
-		return ($wpdb->query($wpdb->prepare($sql, gmdate("Y-m-d H:i:s"), $visitors, $visits, get_current_blog_id())) !== false);
+		$sql = "INSERT INTO `ahc_visitors` (vst_date, vst_visitors, vst_visits,site_id) values(%s, %d, %d , %d )";
+		return ($wpdb->query($wpdb->prepare($sql, $current_time['full'], $visitors, $visits, get_current_blog_id())) !== false); // FIXED: Use saved timezone
 	}
-
 	//--------------------------------------------
 
 	/**
@@ -846,43 +847,132 @@ class WPHitsCounter
 	 */
 	protected function updateRecentVisitors($vtr_ip_address, $vtr_referer = '', $srh_id = NULL, $bsr_id = NULL, $ctr_id = NULL)
 	{
-
 		global $wpdb;
 
+		// Get current time using saved timezone
+		$current_time = $this->getCurrentLocalTime();
 
 		$ahc_city = '';
 		$ahc_region = '';
 
+		// Performance: Use only 2 APIs - primary and fallback
+		$apis = array(
+			// Primary: ipapi.co - Fast, reliable, 1000 requests/day free
+			array(
+				'url' => "https://ipapi.co/{$vtr_ip_address}/json/",
+				'city_field' => 'city',
+				'region_field' => 'region',
+				'timeout' => 3 // Quick timeout for performance
+			),
+			// Fallback: ip-api.com - Fast, reliable, unlimited free (non-commercial)
+			array(
+				'url' => "http://ip-api.com/json/{$vtr_ip_address}",
+				'city_field' => 'city',
+				'region_field' => 'regionName',
+				'timeout' => 5 // Slightly longer timeout for fallback
+			)
+		);
 
-
-		$ip_data = (ahcfree_advanced_get_link("http://ip-api.com/json/" . $vtr_ip_address));
-
-
-		$ahc_city =  isset($ip_data->city) ? $ip_data->city : '';
-		$ahc_region =  isset($ip_data->regionName) ? $ip_data->regionName : '';
-
-		if ($ahc_city == '' || $ahc_city == 'null' || $ahc_city == null || empty($ahc_city)) {
-			$ip_data = ahcfree_advanced_get_link("https://geoip-db.com/json/" . $vtr_ip_address);
-
-			$ahc_city =  isset($ip_data->city) ? $ip_data->city : '';
-			$ahc_region =  isset($ip_data->state) ? $ip_data->state : '';
-
-			if ($ahc_city == '' || $ahc_city == 'null' || $ahc_city == null || empty($ahc_city)) {
-
-				$ip_data = (ahcfree_advanced_get_link("http://www.geoplugin.net/json.gp?ip=" . $vtr_ip_address));
-
-				$ahc_city =  isset($ip_data->geoplugin_city) ? $ip_data->geoplugin_city : '';
-				$ahc_region =  isset($ip_data->geoplugin_region) ? $ip_data->geoplugin_region : '';
+		// Performance: Try only primary, then fallback if needed
+		foreach ($apis as $api) {
+			try {
+				// Performance: Add timeout to prevent slow responses
+				$ip_data = $this->optimized_get_link($api['url'], $api['timeout']);
+				if (!empty($ip_data)) {
+					$city = isset($ip_data->{$api['city_field']}) ? trim($ip_data->{$api['city_field']}) : '';
+					$region = isset($ip_data->{$api['region_field']}) ? trim($ip_data->{$api['region_field']}) : '';
+					// Performance: If we get valid data, use it and stop
+					if (!empty($city) && $city != 'null' && strlen($city) > 1) {
+						$ahc_city = $city;
+					}
+					if (!empty($region) && $region != 'null' && strlen($region) > 1) {
+						$ahc_region = $region;
+					}
+					// Performance: If we got city data, we're done (don't need to try fallback)
+					if (!empty($ahc_city)) {
+						break;
+					}
+				}
+			} catch (Exception $e) {
+				// Performance: Log error only in debug mode to avoid overhead
+				if (defined('WP_DEBUG') && WP_DEBUG) {
+					error_log("Geolocation API error for {$api['url']}: " . $e->getMessage());
+				}
+				continue;
 			}
 		}
 
-		$sql = "INSERT INTO `ahc_recent_visitors` (vtr_ip_address, vtr_referer, srh_id, bsr_id, ctr_id, ahc_city, ahc_region, vtr_date, vtr_time,site_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %d)";
+		// Performance: Use prepared statement with proper placeholders
+		$sql = "INSERT INTO `ahc_recent_visitors`
+        (vtr_ip_address, vtr_referer, srh_id, bsr_id, ctr_id, ahc_city, ahc_region, vtr_date, vtr_time, site_id)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %d)";
 
-
-
-		return ($wpdb->query($wpdb->prepare($sql, $vtr_ip_address, $vtr_referer, $srh_id, $bsr_id, $ctr_id, $ahc_city, $ahc_region, gmdate("Y-m-d"), gmdate("H:i:s"), get_current_blog_id())) !== false);
+		return ($wpdb->query($wpdb->prepare(
+			$sql,
+			$vtr_ip_address,
+			$vtr_referer,
+			$srh_id,
+			$bsr_id,
+			$ctr_id,
+			$ahc_city,
+			$ahc_region,
+			$current_time['date'],    // FIXED: Use saved timezone instead of gmdate
+			$current_time['time'],    // FIXED: Use saved timezone instead of gmdate
+			get_current_blog_id()
+		)) !== false);
 	}
+	private function optimized_get_link($url, $timeout = 5)
+	{
+		// Performance: Check if we have a cached result (optional - implement if needed)
+		$cache_key = 'geo_' . md5($url);
+		$cached = wp_cache_get($cache_key, 'geolocation');
+		if ($cached !== false) {
+			return $cached;
+		}
 
+		// Performance: Use WordPress HTTP API with optimized settings
+		$args = array(
+			'timeout' => $timeout,
+			'redirection' => 2, // Limit redirects
+			'httpversion' => '1.1',
+			'user-agent' => 'Mozilla/5.0 (compatible; WordPressBotGeo/1.0)',
+			'headers' => array(
+				'Accept' => 'application/json',
+				'Accept-Encoding' => 'gzip, deflate'
+			),
+			'compress' => true,
+			'decompress' => true,
+			'sslverify' => false // Performance: Skip SSL verification for speed (consider security implications)
+		);
+
+		$response = wp_remote_get($url, $args);
+
+		// Performance: Quick error checking
+		if (is_wp_error($response)) {
+			throw new Exception('HTTP request failed: ' . $response->get_error_message());
+		}
+
+		$response_code = wp_remote_retrieve_response_code($response);
+		if ($response_code !== 200) {
+			throw new Exception('HTTP error: ' . $response_code);
+		}
+
+		$body = wp_remote_retrieve_body($response);
+		if (empty($body)) {
+			throw new Exception('Empty response body');
+		}
+
+		// Performance: Parse JSON response
+		$data = json_decode($body);
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			throw new Exception('Invalid JSON response');
+		}
+
+		// Performance: Cache successful results for 1 hour
+		wp_cache_set($cache_key, $data, 'geolocation', 3600);
+
+		return $data;
+	}
 	//--------------------------------------------
 
 	/**
@@ -914,14 +1004,26 @@ class WPHitsCounter
 	 */
 	protected function updateKeywords($kwd_ip_address, $kwd_keywords, $kwd_referer, $srh_id, $bsr_id, $ctr_id = NULL)
 	{
-
 		global $wpdb;
 
+		// Get current time using saved timezone
+		$current_time = $this->getCurrentLocalTime();
+
 		$sql = "INSERT INTO `ahc_keywords` (kwd_ip_address, kwd_keywords, kwd_referer, srh_id, ctr_id, bsr_id, kwd_date, kwd_time,site_id) 
+            VALUES (%s, %s, %s, %d, %d, %d, %s, %s, %d)";
 
-				VALUES (%s, %s, %s, %d, %d, %d, %s, %s, %d)";
-
-		return ($wpdb->query($wpdb->prepare($sql, $kwd_ip_address, $kwd_keywords, $kwd_referer, $srh_id, $ctr_id, $bsr_id, gmdate("Y-m-d"), gmdate("H:i:s"), get_current_blog_id())) !== false);
+		return ($wpdb->query($wpdb->prepare(
+			$sql,
+			$kwd_ip_address,
+			$kwd_keywords,
+			$kwd_referer,
+			$srh_id,
+			$ctr_id,
+			$bsr_id,
+			$current_time['date'],    // FIXED: Use saved timezone instead of gmdate
+			$current_time['time'],    // FIXED: Use saved timezone instead of gmdate
+			get_current_blog_id()
+		)) !== false);
 	}
 
 	//--------------------------------------------
@@ -1078,23 +1180,23 @@ class WPHitsCounter
 	 */
 	protected function updateVisitsTime($visitors = 0, $visits = 0)
 	{
-
 		global $wpdb;
-		$time = gmdate('H:i:s');
-		$sql = "UPDATE `ahc_visits_time` SET vtm_visitors = vtm_visitors + %d, vtm_visits = vtm_visits + %d 
 
-				WHERE TIME(vtm_time_from) <= '$time' AND TIME(vtm_time_to) >= '$time' and site_id=" . get_current_blog_id();
+		// Get current time using saved timezone
+		$current_time = $this->getCurrentLocalTime();
+		$time = $current_time['time']; // FIXED: Use saved timezone instead of gmdate
+
+		$sql = "UPDATE `ahc_visits_time` SET vtm_visitors = vtm_visitors + %d, vtm_visits = vtm_visits + %d 
+				WHERE  TIME(vtm_time_from) <= '$time' AND TIME(vtm_time_to) >= '$time' and site_id=" . get_current_blog_id();
 		$query = $wpdb->prepare($sql, $visitors, $visits);
 		$result = ($wpdb->query($query) !== false);
 
 		$sql = "UPDATE `ahc_visits_time` SET vtm_visitors = 1
-
 				WHERE vtm_visitors = 0 AND TIME(vtm_time_from) <= '$time' AND TIME(vtm_time_to) >= '$time' and site_id=" . get_current_blog_id();
 		$query = $wpdb->query($sql);
 
 		$sql = "UPDATE `ahc_visits_time` SET vtm_visits = 1
-
-				WHERE vtm_visits = 0 AND TIME(vtm_time_from) <= '$time' AND TIME(vtm_time_to) >= '$time' and site_id=" . get_current_blog_id();
+				WHERE vtm_visits = 0 AND TIME(vtm_time_from) <= '$time' AND TIME(vtm_time_to) >= '$time' and site_id = " . get_current_blog_id();
 		$query = $wpdb->query($sql);
 
 		return $result;
@@ -1119,20 +1221,57 @@ class WPHitsCounter
 	 */
 	protected function recordThisHits()
 	{
-
 		global $wpdb;
 
-		$sql = "INSERT INTO `ahc_hits` 
+		// Get current time using saved timezone
+		$current_time = $this->getCurrentLocalTime();
 
-				(`hit_ip_address`, `hit_user_agent`, `hit_request_uri`, `hit_page_id`, `hit_page_title`, `ctr_id`, `hit_referer`, `hit_referer_site`, 
+		$sql = "INSERT INTO `ahc_hits`
+            (`hit_ip_address`, `hit_user_agent`, `hit_request_uri`, `hit_page_id`, `hit_page_title`, `ctr_id`, `hit_referer`, `hit_referer_site`,
+            `srh_id`, `hit_search_words`, `bsr_id`, `hit_date`, `hit_time`, `site_id`)
+            VALUES (%s, %s, %s, %s, %s, %d, %s, %s, %d, %s, %d, %s, %s, %d)";
 
-				`srh_id`, `hit_search_words`, `bsr_id`, `hit_date`, `hit_time`, `site_id`) 
+		$result = $wpdb->query($wpdb->prepare(
+			$sql,
+			$this->ipAddress,
+			$this->userAgent,
+			$this->requestUri,
+			$this->pageId,
+			$this->pageTitle,
+			$this->countryId,
+			$this->referer,
+			$this->refererSite,
+			$this->searchEngine,
+			$this->keyWords,
+			$this->browser,
+			$current_time['date'],    // FIXED: Use saved timezone instead of gmdate
+			$current_time['time'],    // FIXED: Use saved timezone instead of gmdate
+			get_current_blog_id()
+		));
 
-				VALUES (%s, %s, %s, %s, %s, %d, %s, %s, %d, %s, %d, %s, %s, %d)";
-
-		$result = $wpdb->query($wpdb->prepare($sql, $this->ipAddress, $this->userAgent, $this->requestUri, $this->pageId, $this->pageTitle, $this->countryId, $this->referer, $this->refererSite, $this->searchEngine, $this->keyWords, $this->browser, gmdate("Y-m-d"), gmdate("H:i:s"), get_current_blog_id()));
 		return ($result !== false);
 	}
 
 	//--------------------------------------------
+	/**
+	 * Get current time in the site's configured timezone
+	 * This replaces the problematic gmdate() calls
+	 */
+
+	protected function getCurrentLocalTime()
+	{
+		// Always store in UTC to avoid double timezone conversion
+		$utc_timezone = new DateTimeZone('UTC');
+		$datetime = new DateTime('now', $utc_timezone);
+
+		$result = array(
+			'date' => $datetime->format('Y-m-d'),
+			'time' => $datetime->format('H:i:s'),
+			'full' => $datetime->format('Y-m-d H:i:s'),
+			'timezone' => 'UTC'
+		);
+
+		error_log('Storing in UTC: ' . json_encode($result));
+		return $result;
+	}
 }
