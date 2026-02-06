@@ -2,8 +2,8 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 6.8.2
-Stable tag: 8.3
+Tested up to: 6.9
+Stable tag: 8.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,12 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.4 =
+
+- Fixed spelling error in "visitors yesterday"
+- Corrected label under "Views Today" from "visitors" to "views"
+- Improved UI text consistency for visitor/view statistics
 
 = 8.3 =
 1. Bug fixes
