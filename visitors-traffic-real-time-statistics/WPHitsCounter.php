@@ -101,10 +101,14 @@ class WPHitsCounter
 	{
 
 
+		$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
+	if (preg_match('/bot|crawl|slurp|spider|mediapartners/i', $user_agent)) {
+		return;
+	}
 		//$this->cleanUnwantedRecords();
 
-		$this->cleanHitsTable();
+		//$this->cleanHitsTable();
 
 		if (!$this->isHitRecorded()) {
 
@@ -592,7 +596,7 @@ class WPHitsCounter
 	 * @return boolean
 
 	 */
-	public function cleanHitsTable()
+		public function cleanHitsTable()
 	{
 		global $wpdb;
 
@@ -1274,4 +1278,39 @@ class WPHitsCounter
 		error_log('Storing in UTC: ' . json_encode($result));
 		return $result;
 	}
+	
+	
+	
+	
+public static function schedule_cleanup() {
+
+    if (!wp_next_scheduled('ahc_cleanup_event')) {
+
+        wp_schedule_event(time() + 300, 'daily', 'ahc_cleanup_event');
+
+    }
+
+}
+
+public static function unschedule_cleanup() {
+
+    $timestamp = wp_next_scheduled('ahc_cleanup_event');
+
+    if ($timestamp) {
+
+        wp_unschedule_event($timestamp, 'ahc_cleanup_event');
+
+    }
+
+}
+
+public static function run_cleanup() {
+
+if (!isset($_SERVER['HTTP_USER_AGENT'])) $_SERVER['HTTP_USER_AGENT'] = 'wp-cron';
+    if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI'] = '/wp-cron.php';
+
+    $counter = new self(0);
+    $counter->cleanHitsTable();
+
+}
 }

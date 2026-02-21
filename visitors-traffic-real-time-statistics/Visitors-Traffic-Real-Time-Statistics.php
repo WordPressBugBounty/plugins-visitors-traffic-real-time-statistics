@@ -4,7 +4,7 @@ Plugin Name: Visitor Traffic Real Time Statistics
 Description: Hits counter that shows analytical numbers of your WordPress site visitors and hits.
 Author: wp-buy
 Author URI: https://www.wp-buy.com/
-Version: 8.4
+Version: 8.5
 Text Domain: visitors-traffic-real-time-statistics
 Domain Path: /languages
 */
@@ -85,6 +85,15 @@ function ahcfree_send_first_visit_request()
 
 add_action('plugins_loaded', 'ahcfree_init');
 add_action('plugins_loaded', 'ahcfree_multisite_init', 99);
+
+
+add_action('ahc_cleanup_event', ['WPHitsCounter', 'run_cleanup']);
+
+register_activation_hook(__FILE__, ['WPHitsCounter', 'schedule_cleanup']);
+
+register_deactivation_hook(__FILE__, ['WPHitsCounter', 'unschedule_cleanup']);
+
+
 //if ( function_exists('get_plugin_data') ) {
 //	$woodhl_detail = get_plugin_data( __FILE__ );
 //	$installed_version = get_option( 'visitors-traffic-real-time-statistics-pro-version' );

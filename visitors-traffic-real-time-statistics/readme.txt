@@ -2,8 +2,8 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 6.9
-Stable tag: 8.4
+Tested up to: 6.9.1
+Stable tag: 8.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,14 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.5 =
+1. Prevent Stored XSS in visitor tracking
+2. Prevent XSS when displaying page titles in the admin
+3. Use safe text for DataTable content
+4. Improved wp-cron cleanup (performance)
+5. Safer DB Cleanup (DELETE by batch)
+7. Bot Filtering (Reduce Monitoring Overhead)
 
 = 8.4 =
 

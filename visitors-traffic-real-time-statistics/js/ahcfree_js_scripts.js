@@ -404,7 +404,7 @@ jQuery(document).ready(function () {
                 }
             </style>
             <div class="traffic-header-enhanced">
-                <div class="page-title">${pageTitle}</div>
+                <div class="page-title"></div>
                 <div class="hits">${hits.toLocaleString()} hits</div>
             </div>
             <div class="traffic-image-container">
@@ -416,6 +416,8 @@ jQuery(document).ready(function () {
 
 			// Update modal content and title
 			jQuery('#TrafficStatsModal .modal-body').html(headerHtml);
+			jQuery('#TrafficStatsModal .modal-body').html(headerHtml);
+			jQuery('#TrafficStatsModal .modal-body .page-title').text(pageTitle);
 			jQuery('#TrafficStatsModal .modal-title').text('Page Statistics: ' + pageTitle);
 
 			// Show modal

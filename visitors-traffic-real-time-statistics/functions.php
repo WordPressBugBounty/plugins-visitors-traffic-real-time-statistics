@@ -1389,6 +1389,18 @@ function ahcfree_update_tables()
     foreach ($sqlQueries as $sql) {
         $wpdb->query($sql);
     }
+	
+	
+	 if (get_option('ahc_db_indexes_ahc_online_users_added')) {
+        return;
+    }
+	
+
+    $wpdb->query("ALTER TABLE ahc_hits ADD INDEX idx_hit_date (hit_date)");
+    $wpdb->query("ALTER TABLE ahc_hits ADD INDEX idx_ip_page (hit_ip_address, hit_page_id)");
+    $wpdb->query("ALTER TABLE ahc_online_users ADD INDEX idx_online_date (`date`)");
+
+    update_option('ahc_db_indexes_ahc_online_users_added', 1);
 }
 
 function ahcfree_add_settings()
@@ -3289,7 +3301,11 @@ function ahcfree_track_visitor()
 
 
             $page_id = intval($_POST['page_id']);
-            $page_title = ahc_free_sanitize_text_or_array_field($_POST['page_title']);
+           // $page_title = ahc_free_sanitize_text_or_array_field($_POST['page_title']);
+           
+            $page_title_raw = isset($_POST['page_title']) ? wp_unslash($_POST['page_title']) : '';
+			$page_title_decoded = html_entity_decode($page_title_raw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			$page_title = sanitize_text_field(wp_strip_all_tags($page_title_decoded, true));
             $post_type = ahc_free_sanitize_text_or_array_field($_POST['post_type']);
             $_SERVER['HTTP_REFERER'] = ahc_free_sanitize_text_or_array_field($_POST['referer']);
             $_SERVER['HTTP_USER_AGENT'] = ahc_free_sanitize_text_or_array_field($_POST['useragent']);
