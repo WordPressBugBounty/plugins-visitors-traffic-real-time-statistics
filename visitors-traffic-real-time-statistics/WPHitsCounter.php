@@ -716,7 +716,7 @@ class WPHitsCounter
 
 		// Get current time using saved timezone
 		$current_time = $this->getCurrentLocalTime();
-		$custom_timezone_offset = ahcpro_get_current_timezone_offset();
+		$custom_timezone_offset = ahcfree_get_current_timezone_offset();
 
 		$sql = "SELECT vtsh_id FROM `ahc_searching_visits` WHERE site_id = %d AND srh_id = %d AND DATE(vtsh_date) = '" . $current_time['date'] . "'";
 

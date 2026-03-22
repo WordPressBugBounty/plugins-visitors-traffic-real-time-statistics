@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 6.9.1
-Stable tag: 8.5
+Stable tag: 8.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,10 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.6 =
+1. Resolved fatal error caused by missing `ahcpro_get_current_timezone_offset()` function in visitor tracking.
+
 
 = 8.5 =
 1. Prevent Stored XSS in visitor tracking
