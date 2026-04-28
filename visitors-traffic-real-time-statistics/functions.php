@@ -503,10 +503,11 @@ function vtrts_free_adminbar_chart()
                     };
                 }
 
+                // Find min and max values
                 const values = dataPoints.map(point => point.y);
-                const minValue = Math.min(...values);
                 const maxValue = Math.max(...values);
 
+                // If all values are the same or very small
                 if (maxValue <= 1) {
                     return {
                         interval: 1,
@@ -514,20 +515,41 @@ function vtrts_free_adminbar_chart()
                     };
                 }
 
-                const range = maxValue - Math.max(0, minValue);
+                // بما أن الشارت يستخدم includeZero:true فالنطاق الفعلي هو [0, maxValue]
+                // نحسب الـ interval على أساس maxValue لضمان عدد معقول من الـ labels (5-8 labels)
                 let interval;
 
-                if (range <= 10) interval = 1;
-                else if (range <= 50) interval = 5;
-                else if (range <= 100) interval = 10;
-                else if (range <= 500) interval = 25;
-                else if (range <= 1000) interval = 50;
-                else if (range <= 5000) interval = 100;
-                else interval = Math.ceil(range / 10);
+                if (maxValue <= 10) {
+                    interval = 1;        //  1, 2, 3, ..., 10
+                } else if (maxValue <= 20) {
+                    interval = 5;        //  5, 10, 15, 20
+                } else if (maxValue <= 50) {
+                    interval = 10;       //  10, 20, 30, 40, 50
+                } else if (maxValue <= 100) {
+                    interval = 20;       //  20, 40, 60, 80, 100
+                } else if (maxValue <= 200) {
+                    interval = 50;       //  50, 100, 150, 200
+                } else if (maxValue <= 500) {
+                    interval = 100;      //  100, 200, 300, 400, 500
+                } else if (maxValue <= 1000) {
+                    interval = 200;      //  200, 400, 600, 800, 1000
+                } else if (maxValue <= 5000) {
+                    interval = 1000;     //  1K, 2K, 3K, 4K, 5K
+                } else if (maxValue <= 10000) {
+                    interval = 2000;     //  2K, 4K, 6K, 8K, 10K
+                } else if (maxValue <= 50000) {
+                    interval = 10000;    //  10K, 20K, 30K, 40K, 50K
+                } else if (maxValue <= 100000) {
+                    interval = 20000;    //  20K, 40K, 60K, 80K, 100K
+                } else {
+                    // للأرقام الضخمة: قسم إلى ~5 intervals
+                    const magnitude = Math.pow(10, Math.floor(Math.log10(maxValue)) - 1);
+                    interval = Math.ceil(maxValue / 5 / magnitude) * magnitude;
+                }
 
                 return {
                     interval: interval,
-                    maximum: null
+                    maximum: null // Let CanvasJS decide the maximum
                 };
             }
 
@@ -551,8 +573,9 @@ function vtrts_free_adminbar_chart()
                     includeZero: true,
                     interval: yAxisSettings.interval,
                     maximum: yAxisSettings.maximum,
+                    // Ensure labels are always whole numbers with thousands separator
                     labelFormatter: function(e) {
-                        return Math.round(e.value);
+                        return Math.round(e.value).toLocaleString('en-US');
                     }
                 },
                 legend: {
@@ -1145,7 +1168,11 @@ function ahcfree_enqueue_scripts()
     if (is_archive()) {
         $post_id = get_the_archive_title();
     }
-    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), 'jquery', '', false);
+    // تفعيل WordPress Heartbeat API على الـ frontend أولاً
+    wp_enqueue_script('heartbeat');
+
+    // front.js يعتمد على jquery و heartbeat (يُحمَّل بعدهما)
+    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), array('jquery', 'heartbeat'), '', true);
     wp_enqueue_script('ahc_front_js');
 
     wp_localize_script('ahc_front_js', 'ahc_ajax_front', array(
@@ -1153,7 +1180,8 @@ function ahcfree_enqueue_scripts()
         'plugin_url' => plugin_dir_url(__FILE__), // Add this line
         'page_id' => $post_id,
         'page_title' => $page_title,
-        'post_type' => $post_type
+        'post_type' => $post_type,
+        'visitor_ip' => ahcfree_get_client_ip_address()
     ));
 }
 add_action('wp_enqueue_scripts', 'ahcfree_enqueue_scripts', 1);
@@ -1965,6 +1993,63 @@ function ahcfree_get_summary_statistics()
     $arr['total']['avg_session_duration'] = ahcfree_get_avg_session_duration_total();
 
     return $arr;
+}
+
+/**
+ * Get last 7 days breakdown for sparkline charts in dashboard boxes
+ * Returns visitors and visits per day for the last 7 days (oldest to newest)
+ *
+ * @return array [['date'=>'YYYY-MM-DD','visitors'=>int,'visits'=>int], ...]
+ */
+function ahcfree_get_last_7_days_data()
+{
+    global $wpdb;
+    $custom_timezone_offset = ahcfree_get_current_timezone_offset();
+    $custom_timezone = new DateTimeZone(ahcfree_get_timezone_string());
+    $site_id = get_current_blog_id();
+
+    // Build array for last 7 days (oldest to newest)
+    $days = array();
+    for ($i = 6; $i >= 0; $i--) {
+        $d = new DateTime('now', $custom_timezone);
+        $d->modify('-' . $i . ' day');
+        $days[$d->format('Y-m-d')] = array(
+            'date'     => $d->format('Y-m-d'),
+            'visitors' => 0,
+            'visits'   => 0,
+        );
+    }
+
+    $start_date = array_keys($days)[0];
+    $end_date   = array_keys($days)[6];
+
+    $sql = $wpdb->prepare(
+        "SELECT DATE(CONVERT_TZ(vst_date, %s, %s)) AS dt,
+                SUM(vst_visitors) AS visitors,
+                SUM(vst_visits)   AS visits
+         FROM `ahc_visitors`
+         WHERE site_id = %d
+           AND DATE(CONVERT_TZ(vst_date, %s, %s)) >= %s
+           AND DATE(CONVERT_TZ(vst_date, %s, %s)) <= %s
+         GROUP BY DATE(CONVERT_TZ(vst_date, %s, %s))",
+        AHCFREE_SERVER_CURRENT_TIMEZONE, $custom_timezone_offset,
+        $site_id,
+        AHCFREE_SERVER_CURRENT_TIMEZONE, $custom_timezone_offset, $start_date,
+        AHCFREE_SERVER_CURRENT_TIMEZONE, $custom_timezone_offset, $end_date,
+        AHCFREE_SERVER_CURRENT_TIMEZONE, $custom_timezone_offset
+    );
+
+    $results = $wpdb->get_results($sql, OBJECT);
+    if (is_array($results)) {
+        foreach ($results as $row) {
+            if (isset($days[$row->dt])) {
+                $days[$row->dt]['visitors'] = (int) $row->visitors;
+                $days[$row->dt]['visits']   = (int) $row->visits;
+            }
+        }
+    }
+
+    return array_values($days);
 }
 
 //--------------------------------------------
@@ -4388,8 +4473,7 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
         c.ctr_internet_code,
         b.bsr_name,
         b.bsr_icon,
-        COALESCE(hits_data.hit_count, 1) as day_hits2,
-        COALESCE(hits_data.duration_seconds, 1) as duration_seconds
+        COALESCE(hits_data.hit_count, 1) as day_hits2
     FROM (
         SELECT DISTINCT 
             vtr_ip_address, 
@@ -4412,11 +4496,7 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
         SELECT 
             hit_ip_address,
             DATE(hit_date) as hit_date,
-            COUNT(*) as hit_count,
-            GREATEST(1, TIMESTAMPDIFF(SECOND, 
-                MIN(CONCAT(hit_date, ' ', hit_time)), 
-                MAX(CONCAT(hit_date, ' ', hit_time))
-            )) as duration_seconds
+            COUNT(*) as hit_count
         FROM `ahc_hits` 
         WHERE site_id = $site_id
         AND hit_page_title != ''
@@ -4497,12 +4577,106 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
                 $arr[$c]['ctr_name'] = $img . implode(', ', $location_parts);
                 $arr[$c]['time'] = $visitDate->format('d M Y @ h:i a');
 
-                // Format duration
-                $duration_seconds = max(1, intval($hit->duration_seconds));
-                $hours = floor($duration_seconds / 3600);
-                $minutes = floor(($duration_seconds % 3600) / 60);
-                $seconds = $duration_seconds % 60;
-                $duration_str = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                // Calculate session duration for this IP and date
+                // المنطق:
+                //   1) نحسب الفرق بين أول وآخر hit في نفس اليوم (vtr_date)
+                //   2) نحسب الفرق بين أول hit وأحدث heartbeat في نفس اليوم
+                //   3) نأخذ القيمة الأكبر بينهما (لا تتجاوز 3 ساعات = نافذة الجلسة)
+
+                $session_duration_seconds = 0;
+
+                // أول وآخر hit في نفس اليوم
+                $hits_range = $wpdb->get_row($wpdb->prepare(
+                    "SELECT
+                        MIN(CONCAT(hit_date, ' ', hit_time)) AS first_hit,
+                        MAX(CONCAT(hit_date, ' ', hit_time)) AS last_hit,
+                        TIMESTAMPDIFF(SECOND,
+                            MIN(CONCAT(hit_date, ' ', hit_time)),
+                            MAX(CONCAT(hit_date, ' ', hit_time))
+                        ) AS hits_diff
+                     FROM ahc_hits
+                     WHERE hit_ip_address = %s AND hit_date = %s AND site_id = %d",
+                    $hit->vtr_ip_address,
+                    $hit->vtr_date,
+                    $site_id
+                ));
+
+                if ($hits_range && $hits_range->first_hit) {
+                    // القيمة من الـ hits (قد تكون 0 لو صفحة واحدة)
+                    $from_hits = (int) $hits_range->hits_diff;
+
+                    // محاولة heartbeat match
+                    $from_heartbeat = 0;
+
+                    // الآن كلا الـ heartbeat و الـ INSERT الأصلي يستخدمان ahcfree_localtime
+                    // لكن ahc_hits يخزّن UTC
+                    // نحوّل hit_date + hit_time من UTC إلى توقيت البلجن قبل المقارنة
+                    $plugin_offset_str = ahcfree_get_current_timezone_offset(); // "+03:00"
+
+                    // نحوّل first_hit و last_hit من UTC إلى توقيت البلجن
+                    $first_hit_local = $wpdb->get_var($wpdb->prepare(
+                        "SELECT DATE_FORMAT(CONVERT_TZ(%s, '+00:00', %s), '%%Y-%%m-%%d %%H:%%i:%%s')",
+                        $hits_range->first_hit,
+                        $plugin_offset_str
+                    ));
+
+                    $last_hit_local = $wpdb->get_var($wpdb->prepare(
+                        "SELECT DATE_FORMAT(CONVERT_TZ(%s, '+00:00', %s), '%%Y-%%m-%%d %%H:%%i:%%s')",
+                        $hits_range->last_hit,
+                        $plugin_offset_str
+                    ));
+
+                    if ($first_hit_local && $last_hit_local) {
+                        // نبحث عن أحدث heartbeat ضمن نافذة الجلسة
+                        // نستخدم مقارنة نصوص مباشرة - لا تحتاج UNIX_TIMESTAMP
+                        $last_heartbeat_local = $wpdb->get_var($wpdb->prepare(
+                            "SELECT MAX(`date`)
+                             FROM ahc_online_users
+                             WHERE hit_ip_address = %s
+                               AND site_id        = %d
+                               AND `date`         >= DATE_SUB(%s, INTERVAL 1 MINUTE)
+                               AND `date`         <= DATE_ADD(%s, INTERVAL 3 HOUR)",
+                            $hit->vtr_ip_address,
+                            $site_id,
+                            $first_hit_local,
+                            $last_hit_local
+                        ));
+
+                        if ($last_heartbeat_local) {
+                            $diff = strtotime($last_heartbeat_local) - strtotime($first_hit_local);
+                            if ($diff > 0 && $diff <= 10800) {
+                                $from_heartbeat = $diff;
+                            }
+                        }
+
+                        // Debug log
+                        if (defined('WP_DEBUG') && WP_DEBUG) {
+                            error_log(sprintf(
+                                '[ahcfree dur] ip=%s first_local=%s last_local=%s last_hb=%s from_hits=%d from_hb=%d',
+                                $hit->vtr_ip_address,
+                                $first_hit_local,
+                                $last_hit_local,
+                                $last_heartbeat_local ?: 'none',
+                                $from_hits,
+                                $from_heartbeat
+                            ));
+                        }
+                    }
+
+                    // نأخذ القيمة الأكبر
+                    $session_duration_seconds = max($from_hits, $from_heartbeat);
+                }
+
+                if ($session_duration_seconds && $session_duration_seconds > 0) {
+                    $hours = floor($session_duration_seconds / 3600);
+                    $minutes = floor(($session_duration_seconds % 3600) / 60);
+                    $seconds = $session_duration_seconds % 60;
+                    $duration_str = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                } else {
+                    // لا يوجد heartbeat مسجّل → الزائر أغلق الصفحة خلال أقل من 15 ثانية
+                    // (الحد الأدنى للـ Heartbeat API)
+                    $duration_str = '< 15s';
+                }
 
                 $arr[$c]['duration'] = $duration_str;
 
@@ -4861,5 +5035,61 @@ function ahcfree_wpb_load_widget()
 }
 
 add_action('widgets_init', 'ahcfree_wpb_load_widget');
+
+// ============================================================
+// WordPress Heartbeat API — استقبال ping من الزائر
+// يُستدعى تلقائياً من WordPress كل 15-60 ثانية
+// يحدّث عمود date في ahc_online_users الموجود أصلاً
+// (لا يضيف أي عمود أو جدول جديد)
+// ============================================================
+add_filter('heartbeat_received', 'ahcfree_heartbeat_received', 10, 2);
+add_filter('heartbeat_nopriv_received', 'ahcfree_heartbeat_received', 10, 2);
+
+function ahcfree_heartbeat_received($response, $data)
+{
+    if (empty($data['ahcfree_heartbeat_ip'])) {
+        return $response;
+    }
+
+    global $wpdb;
+
+    $ip      = sanitize_text_field($data['ahcfree_heartbeat_ip']);
+    $site_id = get_current_blog_id();
+
+    // نستخدم نفس ahcfree_localtime التي يستخدمها INSERT الأصلي
+    // لضمان تطابق التوقيت في جميع السجلات
+    $now_local = ahcfree_localtime('Y-m-d H:i:s');
+
+    // نحدّث جميع سجلات الـ IP النشطة (ليس LIMIT 1)
+    // لضمان أن أي استعلام يقرأ أحدث وقت صحيح
+    $updated = $wpdb->query($wpdb->prepare(
+        "UPDATE `ahc_online_users`
+         SET    `date` = %s
+         WHERE  `hit_ip_address` = %s
+           AND  `site_id`        = %d
+           AND  `date`           >= DATE_SUB(%s, INTERVAL 2 HOUR)",
+        $now_local,
+        $ip,
+        $site_id,
+        $now_local
+    ));
+
+    // Debug log — يمكن حذفه لاحقاً بعد التأكد
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log(sprintf(
+            '[ahcfree heartbeat] ip=%s site=%d rows_updated=%d last_error=%s',
+            $ip, $site_id, (int) $updated, $wpdb->last_error
+        ));
+    }
+
+    // نضيف معلومات تشخيص في الـ response (يظهر في Network → Response)
+    $response['ahcfree_hb'] = array(
+        'ip'           => $ip,
+        'rows_updated' => (int) $updated,
+        'error'        => $wpdb->last_error,
+    );
+
+    return $response;
+}
 
 ?>

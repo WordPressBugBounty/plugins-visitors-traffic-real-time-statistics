@@ -15,3 +15,33 @@ var xhttp = new XMLHttpRequest();
 xhttp.open("POST", ahc_ajax_front.ajax_url, true);
 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 xhttp.send("action=ahcfree_track_visitor&page_id="+ page_id +"&page_title="+ page_title + "&post_type="+ post_type + "&referer="+ referer +"&useragent="+ useragent +"&servername="+ servername +"&hostname="+ hostname +"&request_uri="+request_uri);
+
+// ============================================================
+// WordPress Heartbeat API integration
+// يضيف IP الزائر على كل heartbeat يرسله WordPress تلقائياً
+// ============================================================
+(function() {
+    function attachHeartbeat() {
+        if (typeof jQuery === 'undefined') {
+            setTimeout(attachHeartbeat, 200);
+            return;
+        }
+
+        jQuery(document).on('heartbeat-send.ahcfree', function(event, data) {
+            if (typeof ahc_ajax_front !== 'undefined' && ahc_ajax_front.visitor_ip) {
+                data['ahcfree_heartbeat_ip'] = ahc_ajax_front.visitor_ip;
+            }
+        });
+
+        // تسريع الـ heartbeat لكل 15 ثانية (الحد الأدنى المسموح)
+        if (typeof wp !== 'undefined' && wp.heartbeat) {
+            wp.heartbeat.interval('fast');
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachHeartbeat);
+    } else {
+        attachHeartbeat();
+    }
+})();

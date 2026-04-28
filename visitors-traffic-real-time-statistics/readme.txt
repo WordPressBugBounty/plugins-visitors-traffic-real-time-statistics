@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 6.9.1
-Stable tag: 8.6
+Stable tag: 8.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,13 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.7 =
+1. Accurate session duration tracking using WordPress Heartbeat API (fixes single-page visits showing as 1 second)
+2. Redesigned dashboard with modern stat boxes, sparkline charts, and day-over-day comparison indicators
+3. Smarter Y-axis scaling on the visitors chart for cleaner readability with large numbers
+4. Improved English and Arabic labels (grammar, spelling, and consistency)
+5. Fixed timezone handling in duration calculations to prevent incorrect time values
 
 = 8.6 =
 1. Resolved fatal error caused by missing `ahcpro_get_current_timezone_offset()` function in visitor tracking.

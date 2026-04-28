@@ -16,7 +16,7 @@
         <div>
             <div class="row">
                 <div class="col-md-6">
-                    <h3>Welcme to wp-buy.com !</h3>
+                    <h3>Welcome to wp-buy.com!</h3>
                     <p>wp-buy is a software development company that provides IT solutions to successfully improving your business performance.<br> We are a team working at wp-buy.com and dishing out absolute awesomeness in the form of WordPress plugins and themes.<br>Our brains are plump with theme & plugin ideas.</p>
                 </div>
 

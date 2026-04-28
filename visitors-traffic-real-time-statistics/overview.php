@@ -359,29 +359,317 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
     <!-- Top 4 boxes in admin page -->
 
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="box_widget greenBox">
-                <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true"><img src="<?php echo esc_url(plugins_url('images/upgrade_now.png', AHCFREE_PLUGIN_MAIN_FILE)) ?>"></a>
-                <br /><span class="txt"><img src="<?php echo esc_url(plugins_url('images/live.gif', AHCFREE_PLUGIN_MAIN_FILE)) ?>">&nbsp; Online Users</span>
+    <?php
+    // ===== Modern Dashboard Boxes Data =====
+    // Independently fetch data directly (the $ahc_sum_stat var is defined later in this file)
+    $ahcfree_box_today     = ahcfree_get_visitors_visits_in_period('today');
+    $ahcfree_box_yesterday = ahcfree_get_visitors_visits_in_period('yesterday');
+
+    $ahcfree_today_visitors     = isset($ahcfree_box_today['visitors'])     ? (int) $ahcfree_box_today['visitors']     : 0;
+    $ahcfree_today_visits       = isset($ahcfree_box_today['visits'])       ? (int) $ahcfree_box_today['visits']       : 0;
+    $ahcfree_yesterday_visitors = isset($ahcfree_box_yesterday['visitors']) ? (int) $ahcfree_box_yesterday['visitors'] : 0;
+    $ahcfree_yesterday_visits   = isset($ahcfree_box_yesterday['visits'])   ? (int) $ahcfree_box_yesterday['visits']   : 0;
+
+    // All-time search engine totals
+    $ahcfree_alltime_se = ahcfree_get_hits_search_engines_referers('alltime');
+    $ahcfree_total_search = 0;
+    if (is_array($ahcfree_alltime_se)) {
+        foreach ($ahcfree_alltime_se as $v) { $ahcfree_total_search += (int) $v; }
+    }
+    // Today's search engine count (for the "+N today" badge)
+    $ahcfree_today_se = ahcfree_get_hits_search_engines_referers('today');
+    $ahcfree_today_search = 0;
+    if (is_array($ahcfree_today_se)) {
+        foreach ($ahcfree_today_se as $v) { $ahcfree_today_search += (int) $v; }
+    }
+
+    // 7 days breakdown for sparklines
+    $ahcfree_last_7_days = ahcfree_get_last_7_days_data();
+    $ahcfree_visitors_sparkline = array_map(function ($d) { return $d['visitors']; }, $ahcfree_last_7_days);
+    $ahcfree_visits_sparkline   = array_map(function ($d) { return $d['visits']; },   $ahcfree_last_7_days);
+    ?>
+
+    <div class="row ahcfree-modern-boxes">
+        <!-- Box 1: Upgrade to Pro (Online Users is a Pro feature) -->
+        <div class="col-lg-3 col-md-6">
+            <a href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true" target="_blank" class="ahcfree-mbox-link">
+                <div class="ahcfree-mbox ahcfree-mbox-upgrade" data-color="green">
+                    <div class="ahcfree-mbox-head">
+                        <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> Online Users</span>
+                        <span class="ahcfree-mbox-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+                        </span>
+                    </div>
+                    <div class="ahcfree-mbox-upgrade-cta">
+                        <span class="ahcfree-mbox-upgrade-star">★</span>
+                        <span class="ahcfree-mbox-upgrade-text">Upgrade to Pro</span>
+                    </div>
+                    <div class="ahcfree-mbox-meta">
+                        <span class="ahcfree-mbox-badge ahcfree-mbox-badge-up">Pro Feature</span>
+                        <span class="ahcfree-mbox-sub">Live counter</span>
+                    </div>
+                    <div class="ahcfree-mbox-spark ahcfree-mbox-spark-locked">
+                        <svg viewBox="0 0 200 36" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="ahcfreeUpgradeGrad" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
+                                    <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M2,28 L35,20 L68,24 L101,14 L134,18 L167,8 L198,12 L198,34 L2,34 Z" fill="url(#ahcfreeUpgradeGrad)"/>
+                            <path d="M2,28 L35,20 L68,24 L101,14 L134,18 L167,8 L198,12" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,2" opacity="0.6"/>
+                        </svg>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Box 2: Today's Visitors -->
+        <div class="col-lg-3 col-md-6">
+            <div class="ahcfree-mbox" data-color="orange">
+                <div class="ahcfree-mbox-head">
+                    <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> Today's Visitors</span>
+                    <span class="ahcfree-mbox-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+                    </span>
+                </div>
+                <div class="ahcfree-mbox-value" id="today_visitors_box"><?php echo ahcfree_NumFormat($ahcfree_today_visitors); ?></div>
+                <div class="ahcfree-mbox-meta">
+                    <?php
+                    $vd = $ahcfree_yesterday_visitors > 0 ? round((($ahcfree_today_visitors - $ahcfree_yesterday_visitors) / $ahcfree_yesterday_visitors) * 100, 1) : 0;
+                    $vd_class = $vd >= 0 ? 'up' : 'down';
+                    $vd_arrow = $vd >= 0 ? '↑' : '↓';
+                    ?>
+                    <span class="ahcfree-mbox-badge ahcfree-mbox-badge-<?php echo $vd_class; ?>"><?php echo $vd_arrow . ' ' . abs($vd) . '%'; ?></span>
+                    <span class="ahcfree-mbox-sub">vs. yesterday (<?php echo ahcfree_NumFormat($ahcfree_yesterday_visitors); ?>)</span>
+                </div>
+                <div class="ahcfree-mbox-spark" data-spark="visitors" data-points="<?php echo esc_attr(implode(',', $ahcfree_visitors_sparkline)); ?>"></div>
             </div>
         </div>
-        <div class="col-lg-3">
-            <div class="box_widget blueBox">
-                <span id="today_visitors_box">0</span><br /><span class="txt">Today's Visitors</span>
+
+        <!-- Box 3: Today's Page Views -->
+        <div class="col-lg-3 col-md-6">
+            <div class="ahcfree-mbox" data-color="blue">
+                <div class="ahcfree-mbox-head">
+                    <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> Today's Page Views</span>
+                    <span class="ahcfree-mbox-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </span>
+                </div>
+                <div class="ahcfree-mbox-value" id="today_visits_box"><?php echo ahcfree_NumFormat($ahcfree_today_visits); ?></div>
+                <div class="ahcfree-mbox-meta">
+                    <?php
+                    $pd = $ahcfree_yesterday_visits > 0 ? round((($ahcfree_today_visits - $ahcfree_yesterday_visits) / $ahcfree_yesterday_visits) * 100, 1) : 0;
+                    $pd_class = $pd >= 0 ? 'up' : 'down';
+                    $pd_arrow = $pd >= 0 ? '↑' : '↓';
+                    ?>
+                    <span class="ahcfree-mbox-badge ahcfree-mbox-badge-<?php echo $pd_class; ?>"><?php echo $pd_arrow . ' ' . abs($pd) . '%'; ?></span>
+                    <span class="ahcfree-mbox-sub">vs. yesterday (<?php echo ahcfree_NumFormat($ahcfree_yesterday_visits); ?>)</span>
+                </div>
+                <div class="ahcfree-mbox-spark" data-spark="visits" data-points="<?php echo esc_attr(implode(',', $ahcfree_visits_sparkline)); ?>"></div>
             </div>
         </div>
-        <div class="col-lg-3">
-            <div class="box_widget redBox">
-                <span id="today_visits_box">0</span><br /><span class="txt">Today's Visits</span>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="box_widget movBox">
-                <span id="today_search_box">0</span><br /><span class="txt">Search Engines</span>
+
+        <!-- Box 4: All-Time Search Engines -->
+        <div class="col-lg-3 col-md-6">
+            <div class="ahcfree-mbox" data-color="violet">
+                <div class="ahcfree-mbox-head">
+                    <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> All-Time Search Engines</span>
+                    <span class="ahcfree-mbox-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                </div>
+                <div class="ahcfree-mbox-value" id="today_search_box"><?php echo ahcfree_NumFormat($ahcfree_total_search); ?></div>
+                <div class="ahcfree-mbox-meta">
+                    <span class="ahcfree-mbox-badge ahcfree-mbox-badge-up" id="ahcfree-search-badge">↑ +<?php echo ahcfree_NumFormat($ahcfree_today_search); ?> today</span>
+                    <span class="ahcfree-mbox-sub" id="ahcfree-search-sub">All time</span>
+                </div>
+                <div class="ahcfree-mbox-spark" data-spark="search" data-total="<?php echo (int) $ahcfree_total_search; ?>" data-today="<?php echo (int) $ahcfree_today_search; ?>"></div>
             </div>
         </div>
     </div>
+
+    <style>
+    .ahcfree-modern-boxes { margin-bottom: 16px; }
+    .ahcfree-modern-boxes [class*="col-"] { padding: 6px; }
+    .ahcfree-mbox-link { text-decoration: none !important; color: inherit !important; display: block; height: 100%; }
+    .ahcfree-mbox-link:hover { text-decoration: none !important; }
+    .ahcfree-mbox {
+        background: #fff;
+        border: 1px solid #e9ecf2;
+        border-radius: 14px;
+        padding: 16px 18px 12px;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+        transition: box-shadow .2s, transform .2s;
+    }
+    .ahcfree-mbox:hover { box-shadow: 0 4px 12px rgba(16,24,40,0.08); transform: translateY(-1px); }
+    .ahcfree-mbox-head {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 10px;
+    }
+    .ahcfree-mbox-title {
+        font-size: 13px; font-weight: 600; color: #475467;
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    .ahcfree-mbox-dot {
+        display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+        background: var(--ahc-accent, #9333ea);
+    }
+    .ahcfree-mbox-icon {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border-radius: 8px;
+        background: #f5f6fa; color: #667085;
+    }
+    .ahcfree-mbox-value {
+        font-size: 30px; font-weight: 700; color: #101828;
+        line-height: 1.1; margin-bottom: 8px;
+    }
+    .ahcfree-mbox-meta {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+    }
+    .ahcfree-mbox-badge {
+        font-size: 12px; font-weight: 600; padding: 3px 8px;
+        border-radius: 6px; white-space: nowrap;
+    }
+    .ahcfree-mbox-badge-up { background: #ecfdf3; color: #027a48; }
+    .ahcfree-mbox-badge-down { background: #fef3f2; color: #b42318; }
+    .ahcfree-mbox-badge-neutral { background: #f2f4f7; color: #475467; }
+    .ahcfree-mbox-sub {
+        font-size: 12px; color: #98a2b3;
+    }
+    .ahcfree-mbox-spark {
+        margin-top: 6px; height: 36px; width: 100%;
+    }
+    .ahcfree-mbox-spark svg { display: block; width: 100%; height: 100%; }
+
+    /* Color accents per box */
+    .ahcfree-mbox[data-color="green"]  { --ahc-accent: #10b981; }
+    .ahcfree-mbox[data-color="orange"] { --ahc-accent: #f59e0b; }
+    .ahcfree-mbox[data-color="blue"]   { --ahc-accent: #0ea5e9; }
+    .ahcfree-mbox[data-color="violet"] { --ahc-accent: #a855f7; }
+
+    /* Upgrade box specific */
+    .ahcfree-mbox-upgrade {
+        background: linear-gradient(135deg, #fff 0%, #f0fdf4 100%);
+        border-color: #d1fae5;
+    }
+    .ahcfree-mbox-upgrade-cta {
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 8px;
+        line-height: 1.1;
+    }
+    .ahcfree-mbox-upgrade-star {
+        font-size: 26px; color: #f59e0b;
+        filter: drop-shadow(0 1px 2px rgba(245,158,11,0.3));
+    }
+    .ahcfree-mbox-upgrade-text {
+        font-size: 18px; font-weight: 700; color: #047857;
+    }
+    .ahcfree-mbox-upgrade:hover .ahcfree-mbox-upgrade-text { color: #065f46; }
+    </style>
+
+    <script>
+    (function () {
+        // ===== Tiny SVG sparkline renderer =====
+        function drawSpark(el, points, color) {
+            if (!points || points.length < 2) {
+                el.innerHTML = '';
+                return;
+            }
+            var w = 200, h = 36, pad = 2;
+            var max = Math.max.apply(null, points);
+            var min = Math.min.apply(null, points);
+            if (max === min) max = min + 1; // avoid divide by zero
+
+            var step = (w - pad * 2) / (points.length - 1);
+            var coords = points.map(function (v, i) {
+                var x = pad + i * step;
+                var y = h - pad - ((v - min) / (max - min)) * (h - pad * 2);
+                return [x, y];
+            });
+
+            var line = coords.map(function (p, i) {
+                return (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1);
+            }).join(' ');
+            // Area path
+            var area = line + ' L' + coords[coords.length - 1][0].toFixed(1) + ',' + h + ' L' + coords[0][0].toFixed(1) + ',' + h + ' Z';
+            // Last point
+            var last = coords[coords.length - 1];
+
+            var gradId = 'ahcfreeg_' + Math.random().toString(36).substr(2, 5);
+
+            el.innerHTML =
+                '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+                  '<defs>' +
+                    '<linearGradient id="' + gradId + '" x1="0" x2="0" y1="0" y2="1">' +
+                      '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.25"/>' +
+                      '<stop offset="100%" stop-color="' + color + '" stop-opacity="0"/>' +
+                    '</linearGradient>' +
+                  '</defs>' +
+                  '<path d="' + area + '" fill="url(#' + gradId + ')"/>' +
+                  '<path d="' + line + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+                  '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="2.5" fill="' + color + '"/>' +
+                '</svg>';
+        }
+
+        function readPoints(el) {
+            var raw = el.getAttribute('data-points') || '';
+            if (!raw) return [];
+            return raw.split(',').map(function (n) { return parseFloat(n) || 0; });
+        }
+
+        function colorFor(box) {
+            var c = box.getAttribute('data-color');
+            if (c === 'green')  return '#10b981';
+            if (c === 'orange') return '#f59e0b';
+            if (c === 'blue')   return '#0ea5e9';
+            if (c === 'violet') return '#a855f7';
+            return '#667085';
+        }
+
+        function renderAllSparks() {
+            var sparks = document.querySelectorAll('.ahcfree-mbox-spark[data-spark]');
+            sparks.forEach(function (el) {
+                var box = el.closest('.ahcfree-mbox');
+                var color = colorFor(box);
+                var type = el.getAttribute('data-spark');
+
+                if (type === 'search') {
+                    // Search engines: build progression from (total - today) to total over 7 points
+                    var total = parseInt(el.getAttribute('data-total') || '0', 10) || 0;
+                    var today = parseInt(el.getAttribute('data-today') || '0', 10) || 0;
+                    if (total > 0) {
+                        var startVal = total - today;
+                        if (startVal < 0) startVal = 0;
+                        var pts = [];
+                        for (var i = 0; i < 7; i++) {
+                            // smooth ascent from startVal to total
+                            pts.push(startVal + (today * (i / 6)));
+                        }
+                        drawSpark(el, pts, color);
+                    }
+                } else {
+                    drawSpark(el, readPoints(el), color);
+                }
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderAllSparks);
+        } else {
+            renderAllSparks();
+        }
+
+        // After search box may be populated by other scripts, re-render
+        setTimeout(renderAllSparks, 500);
+        setTimeout(renderAllSparks, 1500);
+    })();
+    </script>
+
 
     <!-- Traffic Chart in admin page -->
 
