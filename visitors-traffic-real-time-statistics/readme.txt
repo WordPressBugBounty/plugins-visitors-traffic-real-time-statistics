@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 6.9.1
-Stable tag: 8.7
+Stable tag: 8.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,9 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.8 =
+1. Refreshed the dashboard with new summary boxes and trend indicators
 
 = 8.7 =
 1. Accurate session duration tracking using WordPress Heartbeat API (fixes single-page visits showing as 1 second)
