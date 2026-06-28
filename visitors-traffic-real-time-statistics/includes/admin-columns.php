@@ -179,22 +179,91 @@ function ahcfree_populate_hits_column($column, $post_id)
                 display: flex;
                 justify-content: center;
             }
-            .ahc-chart-promo {
+            .ahc-chart-locked {
                 position: relative;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                transition: transform 0.3s ease;
-                width: 60%;
-                max-width: 400px;
-            }
-          
-            .ahc-chart-promo img {
                 width: 100%;
-                height: auto;
-                display: block;
+                max-width: 460px;
+                border-radius: 10px;
+                overflow: hidden;
+                border: 1px solid #e2e4e7;
             }
+            .ahc-chart-locked__data {
+                filter: blur(2px);
+                opacity: 0.9;
+                padding: 14px 14px 6px;
+            }
+            .ahc-chart-locked__bars {
+                display: flex;
+                align-items: flex-end;
+                gap: 8px;
+                height: 150px;
+                padding: 0 4px;
+            }
+            .ahc-chart-locked__bar {
+                flex: 1;
+                background: linear-gradient(180deg, #4a9be0 0%, #2271b1 100%);
+                border-radius: 4px 4px 0 0;
+            }
+            .ahc-chart-locked__axis {
+                margin-top: 8px;
+                border-top: 1px solid #e2e4e7;
+            }
+            .ahc-chart-locked__overlay {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 20px;
+                background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.78) 100%);
+            }
+            .ahc-chart-locked__lock {
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: #2271b1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 11px;
+                box-shadow: 0 6px 16px rgba(34,113,177,0.32), 0 0 0 6px rgba(255,255,255,0.7);
+            }
+            .ahc-chart-locked__headline {
+                font-size: 15px;
+                font-weight: 700;
+                color: #1d2327;
+                margin-bottom: 5px;
+                background: rgba(255,255,255,0.85);
+                padding: 3px 10px;
+                border-radius: 6px;
+            }
+            .ahc-chart-locked__subline {
+                font-size: 12.5px;
+                line-height: 1.5;
+                color: #3c434a;
+                max-width: 320px;
+                margin-bottom: 14px;
+                background: rgba(255,255,255,0.85);
+                padding: 3px 10px;
+                border-radius: 6px;
+            }
+            .ahc-chart-locked__btn {
+                display: inline-block;
+                background: #2271b1;
+                color: #fff !important;
+                font-size: 13.5px;
+                font-weight: 700;
+                text-decoration: none;
+                padding: 9px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(34,113,177,0.3);
+            }
+            .ahc-chart-locked__btn:hover { background: #135e96; }
         </style>';
+
+        $ahc_pro_url = "https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029";
 
         echo '<div id="ahcHitsModal" class="ahc-modal">
             <div class="ahc-modal-content">
@@ -218,12 +287,35 @@ function ahcfree_populate_hits_column($column, $post_id)
                     </div>
                 </div>
                 
-                <!-- Promotional Image Only -->
+                <!-- Locked chart preview (blurred real-style chart + upgrade overlay) -->
                 <div class="ahc-chart-promo-container">
-                    <div class="ahc-chart-promo">
-                        <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029">
-                            <img src="' . plugins_url('images/Traffic_by_Title_PRO.jpg', AHCFREE_PLUGIN_MAIN_FILE) . '" alt="Traffic by Title PRO" />
-                        </a>
+                    <div class="ahc-chart-locked">
+                        <div class="ahc-chart-locked__data" aria-hidden="true">
+                            <div class="ahc-chart-locked__bars">
+                                <div class="ahc-chart-locked__bar" style="height:35%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:55%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:42%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:68%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:50%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:78%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:60%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:88%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:72%"></div>
+                                <div class="ahc-chart-locked__bar" style="height:95%"></div>
+                            </div>
+                            <div class="ahc-chart-locked__axis"></div>
+                        </div>
+                        <div class="ahc-chart-locked__overlay">
+                            <div class="ahc-chart-locked__lock">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="11" width="14" height="9" rx="2" stroke="#fff" stroke-width="2"/>
+                                    <path d="M8 11V8a4 4 0 018 0v3" stroke="#fff" stroke-width="2"/>
+                                </svg>
+                            </div>
+                            <div class="ahc-chart-locked__headline">See this page&rsquo;s full trend</div>
+                            <div class="ahc-chart-locked__subline">Pro shows daily hits, unique visitors, average and peak days for every page.</div>
+                            <a class="ahc-chart-locked__btn" target="_blank" rel="noopener" href="' . esc_url($ahc_pro_url) . '">Unlock with Pro</a>
+                        </div>
                     </div>
                 </div>
             </div>

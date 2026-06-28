@@ -4,7 +4,7 @@ Plugin Name: Visitor Traffic Real Time Statistics
 Description: Hits counter that shows analytical numbers of your WordPress site visitors and hits.
 Author: wp-buy
 Author URI: https://www.wp-buy.com/
-Version: 8.8
+Version: 8.9.1
 Text Domain: visitors-traffic-real-time-statistics
 Domain Path: /languages
 */
@@ -16,6 +16,7 @@ define('AHCFREE_PLUGIN_ROOT_DIR', dirname(__FILE__));
 require_once(AHCFREE_PLUGIN_ROOT_DIR . "/functions.php");
 require_once(AHCFREE_PLUGIN_ROOT_DIR . "/init.php");
 require_once(AHCFREE_PLUGIN_ROOT_DIR . "/includes/admin-columns.php");
+require_once(AHCFREE_PLUGIN_ROOT_DIR . "/includes/ahcfree-geolocation.php");
 
 if (!function_exists('get_plugin_data') or !function_exists('wp_get_current_user')) {
 	include_once(ABSPATH . 'wp-includes/pluggable.php');
@@ -64,7 +65,6 @@ function ahcfree_set_default_timezone_and_send_request()
 // Function to trigger first visit tracking
 function ahcfree_send_first_visit_request()
 {
-	error_log('Sending first visit request...');
 ?>
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
@@ -90,8 +90,10 @@ add_action('plugins_loaded', 'ahcfree_multisite_init', 99);
 add_action('ahc_cleanup_event', ['WPHitsCounter', 'run_cleanup']);
 
 register_activation_hook(__FILE__, ['WPHitsCounter', 'schedule_cleanup']);
+register_activation_hook(__FILE__, 'ahcfree_geoip_on_activation');
 
 register_deactivation_hook(__FILE__, ['WPHitsCounter', 'unschedule_cleanup']);
+register_deactivation_hook(__FILE__, 'ahcfree_geoip_unschedule_cron');
 
 
 //if ( function_exists('get_plugin_data') ) {
@@ -116,6 +118,23 @@ function ahcfree_HideMessageAjaxFunction()
 {
 	add_option('ahcfree_upgrade_message', 'yes');
 }
+
+/**
+ * Persist dismissal of the newsletter subscribe banner so it does not reappear
+ * on every dashboard load. Stored per-user.
+ */
+function ahcfree_dismiss_subscribe_notice()
+{
+	check_ajax_referer('ahcfree_subscribe_nonce', 'nonce');
+
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error();
+	}
+
+	update_user_meta(get_current_user_id(), 'ahcfree_subscribe_dismissed', '1');
+	wp_send_json_success();
+}
+add_action('wp_ajax_ahcfree_dismiss_subscribe_notice', 'ahcfree_dismiss_subscribe_notice');
 
 
 function ahcfree_after_plugin_row($plugin_file, $plugin_data, $status)

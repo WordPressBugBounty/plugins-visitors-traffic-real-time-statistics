@@ -23,6 +23,7 @@ if(!defined('WP_UNINSTALL_PLUGIN')){
             $sqlQueries[] = "DROP TABLE IF EXISTS `ahc_title_traffic`";
             $sqlQueries[] = "DROP TABLE IF EXISTS `ahc_visits_time`";
             $sqlQueries[] = "DROP TABLE IF EXISTS `ahc_settings`";
+            $sqlQueries[] = "DROP TABLE IF EXISTS `{$wpdb->prefix}ahc_ip_geo`";
 
             foreach($sqlQueries as $sql){
                     $wpdb->query($sql);
@@ -30,6 +31,13 @@ if(!defined('WP_UNINSTALL_PLUGIN')){
             
             delete_option('ahcfree_custom_timezone');
             delete_option('ahcfree_delete_plugin_data_on_uninstall');
+            delete_option('ahcfree_geoip_enabled');
+            delete_option('ahcfree_geoip_ext_fallback');
+            delete_option('ahcfree_geoip_account_id');
+            delete_option('ahcfree_geoip_license_key');
+            delete_option('ahcfree_geoip_db_last_update');
+            delete_option('ahcfree_geoip_db_last_error');
+            delete_option('ahcfree_geoip_cache_table_ready');
         }
 }
 ?>

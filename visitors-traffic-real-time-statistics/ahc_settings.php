@@ -327,6 +327,16 @@ $ahcfree_ahcfree_haships = get_option('ahcfree_ahcfree_haships');
 $ahcfree_save_ips = get_option('ahcfree_save_ips_opn');
 $ahcproUserRoles = get_option('ahcproUserRoles');
 $ahcproRobots = get_option('ahcproRobots');
+
+// Geolocation options
+$geoip_enabled       = get_option('ahcfree_geoip_enabled', '1');
+$geoip_fallback      = get_option('ahcfree_geoip_ext_fallback', '1');
+$geoip_account_id    = get_option('ahcfree_geoip_account_id', '');
+$geoip_license_key   = get_option('ahcfree_geoip_license_key', '');
+$geoip_db_exists     = function_exists('ahcfree_geoip_db_exists') ? ahcfree_geoip_db_exists() : false;
+$geoip_last_update   = get_option('ahcfree_geoip_db_last_update', '');
+$geoip_last_error    = get_option('ahcfree_geoip_db_last_error', '');
+$geoip_dl_status     = isset($_GET['ahcfree_geoip_dl']) ? sanitize_text_field($_GET['ahcfree_geoip_dl']) : '';
 ?>
 
 <div class="ahc_main_container">
@@ -516,6 +526,114 @@ $ahcproRobots = get_option('ahcproRobots');
                                     <strong>Hash IP Addresses</strong><br>
                                     Hide the last 3 digits of all IP addresses for privacy protection
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geolocation -->
+                <div class="settings-section" id="geolocation-settings">
+                    <h3 class="section-title">Geolocation (Country, Region &amp; City)</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div style="background:#eef6ff; border-left:4px solid #2271b1; padding:12px 15px; border-radius:4px; margin-bottom:15px;">
+                                <strong>Local geolocation database</strong><br>
+                                Visitor country, region and city are detected from a local MaxMind GeoLite2 database
+                                stored on your server. This avoids slow external API calls on every page view and
+                                keeps your site fast.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="ahcfree_geoip_enabled" value="1"
+                                    name="ahcfree_geoip_enabled"
+                                    <?php echo ($geoip_enabled == '1') ? 'checked=checked' : ''; ?>>
+                                <label class="checkbox-label" for="ahcfree_geoip_enabled">
+                                    <strong>Enable geolocation</strong><br>
+                                    Detect visitor country, region and city.
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="ahcfree_geoip_ext_fallback" value="1"
+                                    name="ahcfree_geoip_ext_fallback"
+                                    <?php echo ($geoip_fallback == '1') ? 'checked=checked' : ''; ?>>
+                                <label class="checkbox-label" for="ahcfree_geoip_ext_fallback">
+                                    <strong>Allow one external lookup as fallback</strong><br>
+                                    Used only when the local database has not been downloaded yet. Disable this for
+                                    maximum performance once the local database is in place.
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div style="padding:12px 15px; border:1px solid #e5e5e5; border-radius:6px; background:#fafafa;">
+                                <strong>Database status:</strong>
+                                <?php if ($geoip_db_exists) : ?>
+                                    <span style="color:#1a7f37; font-weight:600;">Installed</span>
+                                    <?php if ($geoip_last_update) : ?>
+                                        &nbsp;&middot;&nbsp; Last updated:
+                                        <?php echo esc_html($geoip_last_update); ?>
+                                    <?php endif; ?>
+                                <?php else : ?>
+                                    <span style="color:#b32d2e; font-weight:600;">Not downloaded yet</span>
+                                    &nbsp;&mdash; click the button below to download it.
+                                <?php endif; ?>
+
+                                <?php if ($geoip_dl_status === 'ok') : ?>
+                                    <div style="color:#1a7f37; margin-top:8px;">Database downloaded successfully.</div>
+                                <?php elseif ($geoip_dl_status === 'fail') : ?>
+                                    <div style="color:#b32d2e; margin-top:8px;">
+                                        Download failed.
+                                        <?php if ($geoip_last_error) : ?>
+                                            <br><small><?php echo esc_html($geoip_last_error); ?></small>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half-width">
+                            <label class="form-label" for="ahcfree_geoip_account_id">MaxMind Account ID
+                                (optional)</label>
+                            <input type="text" value="<?php echo esc_attr($geoip_account_id); ?>" class="form-control"
+                                id="ahcfree_geoip_account_id" name="ahcfree_geoip_account_id" autocomplete="off">
+                            <div class="form-help">For automatic monthly updates from MaxMind. Leave blank to use the
+                                free public mirror.</div>
+                        </div>
+
+                        <div class="form-group half-width">
+                            <label class="form-label" for="ahcfree_geoip_license_key">MaxMind License Key
+                                (optional)</label>
+                            <input type="password" value="<?php echo esc_attr($geoip_license_key); ?>"
+                                class="form-control" id="ahcfree_geoip_license_key" name="ahcfree_geoip_license_key"
+                                autocomplete="off">
+                            <div class="form-help">Create a free key at maxmind.com (GeoLite2). Optional.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <p style="margin:0;">
+                                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=ahcfree_geoip_download'), 'ahcfree_geoip_download_action', 'ahcfree_geoip_download_nonce')); ?>"
+                                    class="btn btn-secondary" style="min-width:auto; padding:10px 20px;">
+                                    <?php echo $geoip_db_exists ? 'Update Database Now' : 'Download Database Now'; ?>
+                                </a>
+                            </p>
+                            <div class="form-help" style="margin-top:8px;">
+                                The database is also refreshed automatically once a month.
                             </div>
                         </div>
                     </div>

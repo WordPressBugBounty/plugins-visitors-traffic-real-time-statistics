@@ -4,6 +4,87 @@
 $custom_timezone_offset = ahcfree_get_current_timezone_offset();
 $custom_timezone_string = ahcfree_get_timezone_string();
 
+if (!function_exists('ahcfree_render_locked_country_panel')) {
+    /**
+     * Render a "Pro" panel that shows a representative SAMPLE country table
+     * behind a soft blur, with an upgrade overlay on top.
+     *
+     * Note: this intentionally uses sample (not real) data. The blur is purely
+     * cosmetic and can be removed client-side, so real visitor data must never
+     * be placed behind it. The sample conveys what the Pro view looks like
+     * without exposing the site's actual figures.
+     *
+     * @param string $variant 'today' | 'all' | 'referring'
+     */
+    function ahcfree_render_locked_country_panel($variant = 'all')
+    {
+        // Representative SAMPLE data only — never the site's real figures,
+        // because the blur can be removed in the browser.
+        $rows = array();
+        $sample = array(
+            array('us', 'United States', 1240),
+            array('gb', 'United Kingdom', 880),
+            array('de', 'Germany', 645),
+            array('in', 'India', 590),
+            array('fr', 'France', 410),
+            array('ca', 'Canada', 305),
+            array('au', 'Australia', 240),
+            array('br', 'Brazil', 180),
+        );
+        foreach ($sample as $s) {
+            $furl = plugins_url('images/flags/' . $s[0] . '.png', AHCFREE_PLUGIN_MAIN_FILE);
+            $rows[] = array(
+                'flag'     => '<img src="' . esc_url($furl) . '" width="26" height="17" alt="" onerror="imgFlagError(this)" />',
+                'name'     => $s[1],
+                'visitors' => $s[2],
+            );
+        }
+
+        $headline = ($variant === 'referring')
+            ? 'See which countries refer you the most'
+            : 'Unlock full country-level insights';
+        $subline = ($variant === 'referring')
+            ? 'Pro reveals referring countries, ranked by traffic, with full history.'
+            : 'Pro adds visits, visitors and trends per country — with unlimited history.';
+
+        $upgrade_url = 'https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true';
+        ?>
+        <div class="vtrts-locked">
+            <div class="vtrts-locked__data" aria-hidden="true">
+                <table class="vtrts-locked__table">
+                    <thead>
+                        <tr><th>#</th><th>Country</th><th>Visitors</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php $i = 1; foreach ($rows as $r) : ?>
+                        <tr>
+                            <td><?php echo intval($i); ?></td>
+                            <td><span class="vtrts-locked__flag"><?php echo $r['flag']; ?></span><?php echo esc_html($r['name']); ?></td>
+                            <td><?php echo number_format_i18n(intval($r['visitors'])); ?></td>
+                        </tr>
+                        <?php $i++; endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="vtrts-locked__overlay">
+                <div class="vtrts-locked__lock">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="11" width="14" height="9" rx="2" stroke="#fff" stroke-width="2"/>
+                        <path d="M8 11V8a4 4 0 018 0v3" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="vtrts-locked__headline"><?php echo esc_html($headline); ?></div>
+                <div class="vtrts-locked__subline"><?php echo esc_html($subline); ?></div>
+                <a class="vtrts-locked__btn" target="_blank" rel="noopener" href="<?php echo esc_url($upgrade_url); ?>">
+                    Unlock with Pro
+                </a>
+            </div>
+        </div>
+        <?php
+    }
+}
+
+
 
 $ahcfree_save_ips = get_option('ahcfree_save_ips_opn');
 if ($custom_timezone_string) {
@@ -28,6 +109,138 @@ $mystart_date = $mystart_date->format('Y-m-d');
 <style>
     body {
         background: #F1F1F1 !important
+    }
+
+    /* Friendly empty-state used across reports that have no data yet */
+    .vtrts-empty {
+        text-align: center;
+        padding: 34px 20px;
+        color: #50575e;
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .vtrts-empty__icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        background: rgba(34, 113, 177, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .vtrts-empty__title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1d2327;
+        margin-bottom: 5px;
+    }
+    .vtrts-empty__text {
+        font-size: 13px;
+        line-height: 1.55;
+        max-width: 360px;
+        margin: 0 auto;
+        color: #646970;
+    }
+
+    /* Locked Pro panel: real/sample data blurred with an upgrade overlay */
+    .vtrts-locked {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 7px 7px;
+        min-height: 280px;
+    }
+    .vtrts-locked__data {
+        filter: blur(2px);
+        opacity: 0.9;
+        pointer-events: none;
+        user-select: none;
+        padding: 6px 12px 12px;
+    }
+    .vtrts-locked__table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .vtrts-locked__table th {
+        text-align: left;
+        font-weight: 600;
+        color: #50575e;
+        padding: 8px 10px;
+        border-bottom: 1px solid #e2e4e7;
+    }
+    .vtrts-locked__table td {
+        padding: 9px 10px;
+        border-bottom: 1px solid #f0f0f1;
+        color: #1d2327;
+    }
+    .vtrts-locked__flag {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+    .vtrts-locked__flag img { vertical-align: middle; border-radius: 2px; }
+    .vtrts-locked__overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.75) 100%);
+    }
+    .vtrts-locked__lock {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: #2271b1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        box-shadow: 0 6px 16px rgba(34,113,177,0.32), 0 0 0 6px rgba(255,255,255,0.7);
+    }
+    .vtrts-locked__headline {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1d2327;
+        margin-bottom: 6px;
+        max-width: 340px;
+        background: rgba(255,255,255,0.85);
+        padding: 4px 12px;
+        border-radius: 6px;
+    }
+    .vtrts-locked__subline {
+        font-size: 13px;
+        line-height: 1.55;
+        color: #3c434a;
+        max-width: 340px;
+        margin-bottom: 16px;
+        background: rgba(255,255,255,0.85);
+        padding: 4px 12px;
+        border-radius: 6px;
+    }
+    .vtrts-locked__btn {
+        display: inline-block;
+        background: #2271b1;
+        color: #fff !important;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 10px 22px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(34,113,177,0.3);
+        transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .vtrts-locked__btn:hover {
+        background: #135e96;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(19,94,150,0.4);
     }
 
     .swal2-content {
@@ -117,232 +330,200 @@ $mystart_date = $mystart_date->format('Y-m-d');
 <div class="ahc_main_container">
     <!-- Top note in admin page -->
 
+    <?php
+    // Show the newsletter banner only if this user hasn't dismissed it.
+    $ahcfree_sub_dismissed = get_user_meta(get_current_user_id(), 'ahcfree_subscribe_dismissed', true);
+
+    // Pre-fill with the logged-in admin's email; fall back to the site admin email.
+    $ahcfree_admin_email = '';
+    if (function_exists('wp_get_current_user')) {
+        $ahcfree_current_user = wp_get_current_user();
+        if ($ahcfree_current_user && !empty($ahcfree_current_user->user_email)) {
+            $ahcfree_admin_email = $ahcfree_current_user->user_email;
+        }
+    }
+    if ($ahcfree_admin_email === '') {
+        $ahcfree_admin_email = get_option('admin_email', '');
+    }
+
+    if ($ahcfree_sub_dismissed !== '1') :
+    ?>
     <div class="row">
         <div class="col-lg-12">
             <br />
-            <div id="vtrts_subscribe" class="notice notice-info is-dismissible" role="alert" style="
-                    border: 1px solid #c3c4c7;
-                    border-left: 4px solid #2271b1;
-                    background: #ffffff;
-                    padding: 10px 10px 0px 15px;
-                    margin: 5px 0 15px;
-                    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
-                    position: relative;
-                ">
-                <div class="notice-content" style="
-                        display: flex; 
-                        align-items: flex-start; 
-                        gap: 15px; 
-                        padding-right: 40px;
-                        flex-wrap: wrap;
-                    ">
-                    <!-- Left section with icon and text -->
-                    <div class="notice-text" style="
-                            display: flex; 
-                            align-items: flex-start; 
-                            gap: 12px; 
-                            flex: 1;
-                            min-width: 280px;
-                        ">
-                        <div class="notice-icon" style="
-                                width: 32px;
-                                height: 32px;
-                                background: #2271b1;
-                                border-radius: 4px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                flex-shrink: 0;
-                                margin-top: 2px;
-                            ">
-                            <svg width="18" height="14" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 4L10 10L18 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                <rect x="1" y="3" width="18" height="14" rx="2" stroke="white" stroke-width="2" />
+            <div id="vtrts_subscribe" role="region" aria-label="Newsletter">
+                <div class="vtrts-sub__inner">
+                    <div class="vtrts-sub__left">
+                        <div class="vtrts-sub__icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 7l9 6 9-6" stroke="#2271b1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="#2271b1" stroke-width="2" />
                             </svg>
                         </div>
-                        <div style="flex: 1;">
-                            <p style="
-                                    margin: 0 0 4px 0;
-                                    font-size: 14px;
-                                    font-weight: 600;
-                                    color: #1d2327;
-                                    line-height: 1.3;
-                                ">
-                                Stay Updated with Plugin News & Exclusive Offers
-                            </p>
-                            <p style="
-                                    margin: 0;
-                                    font-size: 13px;
-                                    line-height: 1.4;
-                                    color: #50575e;
-                                ">
-                                Get the latest updates, configuration help, and
-                                <strong style="color: #d63638; background: rgba(214,54,56,0.1); padding: 1px 4px; border-radius: 2px;">exclusive discount codes</strong>
-                                delivered to your inbox.
-                            </p>
+                        <div class="vtrts-sub__copy">
+                            <div class="vtrts-sub__title">Stay in the loop</div>
+                            <div class="vtrts-sub__text">
+                                Get new releases, helpful tips, and the occasional
+                                <strong>discount coupon</strong> by email. That&rsquo;s it &mdash; no spam.
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Right section with form -->
-                    <div class="notice-form" style="
-                            display: flex; 
-                            align-items: center; 
-                            gap: 8px; 
-                            flex-shrink: 0;
-                            min-width: 200px;
-                        ">
-                        <input type="email" name="ahc_admin_email" id="ahc_admin_email"
-                            value="osama.esh@gmail.com" placeholder="your-email@domain.com"
-                            style="
-                                    padding: 4px 8px;
-                                    border: 1px solid #8c8f94;
-                                    border-radius: 3px;
-                                    font-size: 13px;
-                                    line-height: 2;
-                                    width: 100%;
-                                    max-width: 200px;
-                                    min-width: 140px;
-                                    background: #fff;
-                                    color: #2c3338;
-                                    box-sizing: border-box;
-                                "
-                            onfocus="this.style.borderColor='#2271b1'; this.style.boxShadow='0 0 0 1px #2271b1';"
-                            onblur="this.style.borderColor='#8c8f94'; this.style.boxShadow='none';">
-                        <button type="button" class="button button-primary"
-                            onclick="vtrts_open_subscribe_link('osama.esh@gmail.com')" style="
-                                    font-size: 13px;
-                                    line-height: 2;
-                                    min-height: 28px;
-                                    padding: 0 12px;
-                                    background: #2271b1;
-                                    border-color: #2271b1;
-                                    color: #fff;
-                                    text-decoration: none;
-                                    border-radius: 3px;
-                                    border: 1px solid;
-                                    cursor: pointer;
-                                    white-space: nowrap;
-                                    flex-shrink: 0;
-                                "
-                            onmouseover="this.style.background='#135e96'; this.style.borderColor='#135e96';"
-                            onmouseout="this.style.background='#2271b1'; this.style.borderColor='#2271b1';">
+                    <div class="vtrts-sub__actions">
+                        <input type="email" id="ahc_admin_email" placeholder="you@example.com"
+                            value="<?php echo esc_attr($ahcfree_admin_email); ?>">
+                        <button type="button" class="vtrts-sub__btn"
+                            onclick="vtrts_open_subscribe_link('<?php echo esc_js($ahcfree_admin_email); ?>')">
                             Subscribe
+                        </button>
+                        <button type="button" class="vtrts-sub__dismiss" onclick="vtrts_dismiss_notice()">
+                            No thanks
                         </button>
                     </div>
                 </div>
-
-                <!-- WordPress standard dismiss button -->
-                <button type="button" class="notice-dismiss" onclick="vtrts_dismiss_notice()" style="
-                        position: absolute;
-                        top: 0;
-                        right: 1px;
-                        padding: 9px;
-                        background: none;
-                        border: none;
-                        color: #787c82;
-                        cursor: pointer;
-                        font-size: 13px;
-                    " onmouseover="this.style.color='#135e96';" onmouseout="this.style.color='#787c82';">
-                    <span class="screen-reader-text"></span>
-                    <span style="
-                            width: 20px;
-                            height: 20px;
-                            display: block;
-                            position: relative;
-                        ">
-
-
-                    </span>
-                </button>
             </div>
 
-            <!-- Mobile responsive styles -->
             <style>
-                @media (max-width: 768px) {
-                    #vtrts_subscribe {
-                        padding: 10px 40px 10px 10px !important;
-                    }
-
-                    .notice-content {
-                        flex-direction: column !important;
-                        align-items: stretch !important;
-                        gap: 12px !important;
-                    }
-
-                    .notice-text {
-                        min-width: unset !important;
-                        margin-bottom: 8px;
-                    }
-
-                    .notice-form {
-                        justify-content: stretch !important;
-                        min-width: unset !important;
-                    }
-
-                    .notice-form input {
-                        max-width: none !important;
-                        min-width: unset !important;
-                        flex: 1 !important;
-                    }
-
-                    .notice-form button {
-                        min-width: 80px !important;
-                    }
+                #vtrts_subscribe {
+                    position: relative;
+                    margin: 5px 0 18px;
+                    padding: 16px 20px;
+                    border: 1px solid #dcdcde;
+                    border-left: 4px solid #2271b1;
+                    border-radius: 8px;
+                    background: #fff;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
                 }
+                .vtrts-sub__inner {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                }
+                .vtrts-sub__left {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 13px;
+                    flex: 1 1 360px;
+                    min-width: 260px;
+                }
+                .vtrts-sub__icon {
+                    flex: 0 0 auto;
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 8px;
+                    background: rgba(34,113,177,0.08);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-top: 1px;
+                }
+                .vtrts-sub__title {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #1d2327;
+                    line-height: 1.3;
+                    margin-bottom: 3px;
+                }
+                .vtrts-sub__text {
+                    font-size: 13px;
+                    line-height: 1.5;
+                    color: #50575e;
+                }
+                .vtrts-sub__text strong { color: #1d2327; }
+                .vtrts-sub__actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex: 0 0 auto;
+                    flex-wrap: wrap;
+                }
+                .vtrts-sub__actions input {
+                    padding: 7px 11px;
+                    border: 1px solid #8c8f94;
+                    border-radius: 5px;
+                    font-size: 13px;
+                    width: 190px;
+                    max-width: 100%;
+                    background: #fff;
+                    color: #2c3338;
+                    box-sizing: border-box;
+                    transition: border-color .15s ease, box-shadow .15s ease;
+                }
+                .vtrts-sub__actions input:focus {
+                    outline: none;
+                    border-color: #2271b1;
+                    box-shadow: 0 0 0 1px #2271b1;
+                }
+                .vtrts-sub__btn {
+                    padding: 7px 16px;
+                    border: 1px solid #2271b1;
+                    border-radius: 5px;
+                    background: #2271b1;
+                    color: #fff;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    transition: background .15s ease, border-color .15s ease;
+                }
+                .vtrts-sub__btn:hover { background: #135e96; border-color: #135e96; }
+                .vtrts-sub__dismiss {
+                    padding: 7px 10px;
+                    border: none;
+                    background: none;
+                    color: #787c82;
+                    font-size: 13px;
+                    cursor: pointer;
+                    text-decoration: underline;
+                    transition: color .15s ease;
+                }
+                .vtrts-sub__dismiss:hover { color: #50575e; }
 
-                @media (max-width: 480px) {
-                    .notice-form {
-                        flex-direction: column !important;
-                        gap: 8px !important;
-                    }
-
-                    .notice-form input,
-                    .notice-form button {
-                        width: 100% !important;
-                        max-width: none !important;
-                    }
-
-                    .notice-text {
-                        gap: 8px !important;
-                    }
-
-                    .notice-text p:first-child {
-                        font-size: 13px !important;
-                    }
-
-                    .notice-text p:last-child {
-                        font-size: 12px !important;
-                    }
+                @media (max-width: 600px) {
+                    .vtrts-sub__actions { flex: 1 1 100%; }
+                    .vtrts-sub__actions input { flex: 1 1 auto; width: auto; }
                 }
             </style>
 
             <script>
                 function vtrts_dismiss_notice() {
-                    // Note: In production, you'd want to use AJAX to save this server-side
-                    // localStorage won't persist across different devices/browsers
-                    const notice = document.getElementById("vtrts_subscribe");
-                    notice.style.display = "none";
+                    var notice = document.getElementById("vtrts_subscribe");
+                    if (notice) {
+                        notice.style.transition = "opacity .2s ease";
+                        notice.style.opacity = "0";
+                        setTimeout(function () { notice.style.display = "none"; }, 200);
+                    }
+                    try {
+                        jQuery.post(ajaxurl, {
+                            action: "ahcfree_dismiss_subscribe_notice",
+                            nonce: "<?php echo esc_js(wp_create_nonce('ahcfree_subscribe_nonce')); ?>"
+                        });
+                    } catch (e) {}
                 }
 
                 function vtrts_open_subscribe_link(defaultEmail) {
-                    const emailInput = document.getElementById("ahc_admin_email");
-                    const adminEmail = emailInput ? emailInput.value : defaultEmail;
+                    var emailInput = document.getElementById("ahc_admin_email");
+                    var adminEmail = emailInput ? emailInput.value : defaultEmail;
 
-                    if (!adminEmail || !isValidEmail(adminEmail)) {
+                    if (!adminEmail || !vtrts_isValidEmail(adminEmail)) {
                         alert('Please enter a valid email address.');
+                        if (emailInput) { emailInput.focus(); }
                         return;
                     }
 
                     window.open('https://www.wp-buy.com/vtrts-subscribe/?email=' + encodeURIComponent(adminEmail), '_blank');
                 }
 
-                function isValidEmail(email) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                function vtrts_isValidEmail(email) {
+                    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     return emailRegex.test(email);
                 }
             </script>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Header Name and Timezone -->
 
@@ -356,6 +537,100 @@ $mystart_date = $mystart_date->format('Y-m-d');
             <h2 id="ahcfree_currenttime"></h2>
         </div>
     </div>
+
+    <?php
+    // ===== Geolocation setup notice =====
+    // If the local GeoIP database has not been downloaded yet, invite the admin
+    // to finish the one-click setup instead of silently relying on WP-Cron
+    // (which may be disabled on some hosts).
+    if (
+        current_user_can('manage_options')
+        && function_exists('ahcfree_geoip_db_exists')
+        && get_option('ahcfree_geoip_enabled', '1') == '1'
+        && !ahcfree_geoip_db_exists()
+    ) {
+        $ahcfree_setup_url = wp_nonce_url(
+            admin_url('admin-post.php?action=ahcfree_geoip_download'),
+            'ahcfree_geoip_download_action',
+            'ahcfree_geoip_download_nonce'
+        );
+    ?>
+    <div class="ahcfree-setup-notice">
+        <div class="ahcfree-setup-notice__icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" fill="#ffffff"/>
+            </svg>
+        </div>
+        <div class="ahcfree-setup-notice__body">
+            <div class="ahcfree-setup-notice__title">One quick step to finish setup</div>
+            <div class="ahcfree-setup-notice__text">
+                To show your visitors&rsquo; country, region and city, the local geolocation
+                database needs to be downloaded once. It updates automatically every month afterwards.
+            </div>
+        </div>
+        <a class="ahcfree-setup-notice__btn" href="<?php echo esc_url($ahcfree_setup_url); ?>">
+            Click here to complete setup
+        </a>
+    </div>
+    <style>
+        .ahcfree-setup-notice {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 0 22px;
+            padding: 18px 22px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+            box-shadow: 0 6px 18px rgba(19, 94, 150, 0.25);
+            color: #fff;
+            flex-wrap: wrap;
+        }
+        .ahcfree-setup-notice__icon {
+            flex: 0 0 auto;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ahcfree-setup-notice__body {
+            flex: 1 1 320px;
+            min-width: 240px;
+        }
+        .ahcfree-setup-notice__title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .ahcfree-setup-notice__text {
+            font-size: 13.5px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        .ahcfree-setup-notice__btn {
+            flex: 0 0 auto;
+            display: inline-block;
+            background: #fff;
+            color: #135e96 !important;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            padding: 11px 22px;
+            border-radius: 8px;
+            transition: transform .15s ease, box-shadow .15s ease;
+            white-space: nowrap;
+        }
+        .ahcfree-setup-notice__btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        }
+    </style>
+    <?php
+    }
+    ?>
 
     <!-- Top 4 boxes in admin page -->
 
@@ -408,21 +683,14 @@ $mystart_date = $mystart_date->format('Y-m-d');
             <a href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true" target="_blank" class="ahcfree-mbox-link">
                 <div class="ahcfree-mbox" data-color="turquoise">
                     <div class="ahcfree-mbox-head">
-                        <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> Online Users</span>
+                        <span class="ahcfree-mbox-title">Online Users</span>
                         <span class="ahcfree-mbox-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+                            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
                         </span>
                     </div>
                     <div class="ahcfree-mbox-value ahcfree-mbox-value-blur"><?php echo (int) $ahcfree_online_count; ?></div>
                     <div class="ahcfree-mbox-meta">
-                        <span class="ahcfree-mbox-badge">Pro Feature</span>
-                        <span class="ahcfree-mbox-upgrade-link">&#9733; Upgrade</span>
-                    </div>
-                    <div class="ahcfree-mbox-spark-wrap ahcfree-mbox-spark-locked">
-                        <svg viewBox="0 0 200 38" preserveAspectRatio="none">
-                            <path d="M0,22 L33,18 L66,20 L99,12 L132,16 L165,8 L195,10 L195,38 L0,38 Z" fill="#fff" fill-opacity="0.30"/>
-                            <path d="M0,22 L33,18 L66,20 L99,12 L132,16 L165,8 L195,10" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="3,2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <span class="ahcfree-mbox-upgrade-link">&#9733; Upgrade to unlock</span>
                     </div>
                 </div>
             </a>
@@ -432,9 +700,9 @@ $mystart_date = $mystart_date->format('Y-m-d');
         <div class="col-lg-3 col-md-6">
             <div class="ahcfree-mbox" data-color="coral">
                 <div class="ahcfree-mbox-head">
-                    <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> Today's Visitors</span>
+                    <span class="ahcfree-mbox-title">Today's Visitors</span>
                     <span class="ahcfree-mbox-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+                        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
                     </span>
                 </div>
                 <div class="ahcfree-mbox-value" id="today_visitors_box"><?php echo ahcfree_NumFormat($ahcfree_today_visitors); ?></div>
@@ -447,7 +715,6 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <span class="ahcfree-mbox-badge <?php echo $vd_class; ?>"><?php echo $vd_arrow . ' ' . abs($vd) . '%'; ?></span>
                     <span class="ahcfree-mbox-sub">vs. yesterday (<?php echo ahcfree_NumFormat($ahcfree_yesterday_visitors); ?>)</span>
                 </div>
-                <div class="ahcfree-mbox-spark-wrap" data-spark="visitors" data-points="<?php echo esc_attr(implode(',', $ahcfree_visitors_sparkline)); ?>"></div>
             </div>
         </div>
 
@@ -455,9 +722,9 @@ $mystart_date = $mystart_date->format('Y-m-d');
         <div class="col-lg-3 col-md-6">
             <div class="ahcfree-mbox" data-color="blue">
                 <div class="ahcfree-mbox-head">
-                    <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> Today's Page Views</span>
+                    <span class="ahcfree-mbox-title">Today's Page Views</span>
                     <span class="ahcfree-mbox-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
                     </span>
                 </div>
                 <div class="ahcfree-mbox-value" id="today_visits_box"><?php echo ahcfree_NumFormat($ahcfree_today_visits); ?></div>
@@ -470,7 +737,6 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <span class="ahcfree-mbox-badge <?php echo $pd_class; ?>"><?php echo $pd_arrow . ' ' . abs($pd) . '%'; ?></span>
                     <span class="ahcfree-mbox-sub">vs. yesterday (<?php echo ahcfree_NumFormat($ahcfree_yesterday_visits); ?>)</span>
                 </div>
-                <div class="ahcfree-mbox-spark-wrap" data-spark="visits" data-points="<?php echo esc_attr(implode(',', $ahcfree_visits_sparkline)); ?>"></div>
             </div>
         </div>
 
@@ -478,9 +744,9 @@ $mystart_date = $mystart_date->format('Y-m-d');
         <div class="col-lg-3 col-md-6">
             <div class="ahcfree-mbox" data-color="purple">
                 <div class="ahcfree-mbox-head">
-                    <span class="ahcfree-mbox-title"><span class="ahcfree-mbox-dot"></span> All-Time Search Engines</span>
+                    <span class="ahcfree-mbox-title">All-Time Search Engines</span>
                     <span class="ahcfree-mbox-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     </span>
                 </div>
                 <div class="ahcfree-mbox-value" id="today_search_box"><?php echo ahcfree_NumFormat($ahcfree_total_search); ?></div>
@@ -488,205 +754,121 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <span class="ahcfree-mbox-badge ahcfree-mbox-badge-up">&#8593; +<?php echo ahcfree_NumFormat($ahcfree_today_search); ?> today</span>
                     <span class="ahcfree-mbox-sub">All time</span>
                 </div>
-                <div class="ahcfree-mbox-spark-wrap" data-spark="search" data-total="<?php echo (int) $ahcfree_total_search; ?>" data-today="<?php echo (int) $ahcfree_today_search; ?>"></div>
             </div>
         </div>
     </div>
 
     <style>
     .ahcfree-modern-boxes { margin-bottom: 16px; }
-    .ahcfree-modern-boxes [class*="col-"] { padding: 7px; }
-    .ahcfree-mbox-link { text-decoration: none !important; color: #fff !important; display: block; height: 100%; }
-    .ahcfree-mbox-link:hover { text-decoration: none !important; color: #fff !important; }
+    .ahcfree-modern-boxes [class*="col-"] { padding: 8px; }
+    .ahcfree-mbox-link { text-decoration: none !important; color: inherit !important; display: block; height: 100%; }
+    .ahcfree-mbox-link:hover { text-decoration: none !important; color: inherit !important; }
     .ahcfree-mbox {
         position: relative;
-        overflow: hidden;
-        border-radius: 10px;
-        padding: 14px 16px 0;
-        min-height: 136px;
+        border-radius: 12px;
+        padding: 22px;
+        min-height: 124px;
         height: 100%;
-        color: #fff;
+        background: #fff;
+        border: 1px solid #e9ecef;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        transition: transform .15s ease, box-shadow .15s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: box-shadow .15s ease;
     }
     .ahcfree-mbox:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
     }
-    /* Solid bold colors matching legacy palette */
-    .ahcfree-mbox[data-color="turquoise"] { background: #3aafa9; }
-    .ahcfree-mbox[data-color="coral"]     { background: #e57373; }
-    .ahcfree-mbox[data-color="blue"]      { background: #5b8fbd; }
-    .ahcfree-mbox[data-color="purple"]    { background: #8c7baf; }
+    /* Per-card accent color (drives icon color via currentColor) */
+    .ahcfree-mbox[data-color="turquoise"] { color: #3aafa9; }
+    .ahcfree-mbox[data-color="coral"]     { color: #e57373; }
+    .ahcfree-mbox[data-color="blue"]      { color: #5b8fbd; }
+    .ahcfree-mbox[data-color="purple"]    { color: #8c7baf; }
 
     /* Header row: title left, icon right */
     .ahcfree-mbox-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 18px;
     }
     .ahcfree-mbox-title {
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 600;
-        color: #fff;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .ahcfree-mbox-dot {
-        display: inline-block;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #fff;
+        color: #8a929c;
+        text-transform: uppercase;
+        letter-spacing: .04em;
     }
     .ahcfree-mbox-icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 7px;
-        background: rgba(255,255,255,0.22);
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        color: currentColor;
+        flex-shrink: 0;
     }
+    /* Soft tint backgrounds for the icon, per color */
+    .ahcfree-mbox[data-color="turquoise"] .ahcfree-mbox-icon { background: #e8f5f4; }
+    .ahcfree-mbox[data-color="coral"]     .ahcfree-mbox-icon { background: #fdeeee; }
+    .ahcfree-mbox[data-color="blue"]      .ahcfree-mbox-icon { background: #eaf1f8; }
+    .ahcfree-mbox[data-color="purple"]    .ahcfree-mbox-icon { background: #f1eef8; }
+
     /* Big value number */
     .ahcfree-mbox-value {
-        font-size: 36px;
+        font-size: 40px;
         font-weight: 700;
         line-height: 1;
-        margin-bottom: 8px;
-        color: #fff;
+        margin-bottom: 10px;
+        color: #1f2937;
+        letter-spacing: -.01em;
     }
     /* Meta row: badge + sub-text */
     .ahcfree-mbox-meta {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         gap: 8px;
         font-size: 12px;
-        margin-bottom: 8px;
     }
     .ahcfree-mbox-badge {
         display: inline-block;
-        padding: 3px 8px;
-        background: rgba(255,255,255,0.22);
-        border-radius: 5px;
+        padding: 3px 9px;
+        border-radius: 6px;
         font-weight: 600;
+        font-size: 11px;
         white-space: nowrap;
-        color: #fff;
     }
-    /* Trend variants — bold contrast for at-a-glance reading */
+    /* Trend variants */
     .ahcfree-mbox-badge-up {
-        background: #d4f5dd;
-        color: #1d6e3a;
+        background: #e8f6ee;
+        color: #1a8245;
     }
     .ahcfree-mbox-badge-down {
-        background: #ffd9d9;
-        color: #a32d2d;
+        background: #fdecec;
+        color: #c0392b;
     }
     .ahcfree-mbox-sub {
-        opacity: 0.88;
+        color: #a0a6ad;
         white-space: nowrap;
-        color: #fff;
-        font-size: 12px;
+        font-size: 11.5px;
     }
-    /* Sparkline strip pinned to the bottom */
-    .ahcfree-mbox-spark-wrap {
-        margin-top: auto;
-        height: 38px;
-        width: 100%;
-    }
-    .ahcfree-mbox-spark-wrap svg { display: block; width: 100%; height: 100%; }
     /* Upgrade box specific — blurred number + small upgrade link */
     .ahcfree-mbox-value-blur {
-        filter: blur(10px);
+        filter: blur(8px);
+        width: 60px;
         user-select: none;
         pointer-events: none;
     }
     .ahcfree-mbox-upgrade-link {
-        color: #fff;
-        text-decoration: underline;
-        font-size: 11px;
+        color: currentColor;
+        text-decoration: none;
+        font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
-        opacity: 0.95;
     }
     </style>
-
-    <script>
-    (function () {
-        function getBoxBg(el) {
-            // Walk up to find the .ahcfree-mbox parent and read its solid background
-            var box = el.closest ? el.closest('.ahcfree-mbox') : null;
-            if (!box) return '#3aafa9'; // sane fallback
-            var c = box.getAttribute('data-color');
-            if (c === 'turquoise') return '#3aafa9';
-            if (c === 'coral')     return '#e57373';
-            if (c === 'blue')      return '#5b8fbd';
-            if (c === 'purple')    return '#8c7baf';
-            return '#3aafa9';
-        }
-        function drawSpark(el, points) {
-            if (!points || points.length < 2) { el.innerHTML = ''; return; }
-            var w = 200, h = 38;
-            var max = Math.max.apply(null, points);
-            var min = Math.min.apply(null, points);
-            if (max === min) max = min + 1;
-            var step = w / (points.length - 1);
-            var coords = points.map(function (v, i) {
-                var x = i * step;
-                var y = h - 4 - ((v - min) / (max - min)) * (h - 8);
-                return [x, y];
-            });
-            var line = coords.map(function (p, i) {
-                return (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1);
-            }).join(' ');
-            var area = line + ' L' + coords[coords.length - 1][0].toFixed(1) + ',' + h + ' L' + coords[0][0].toFixed(1) + ',' + h + ' Z';
-            var last = coords[coords.length - 1];
-            var bg = getBoxBg(el);
-            el.innerHTML =
-                '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
-                  '<path d="' + area + '" fill="#fff" fill-opacity="0.45"/>' +
-                  '<path d="' + line + '" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>' +
-                  '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="4" fill="#fff"/>' +
-                  '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="2" fill="' + bg + '"/>' +
-                '</svg>';
-        }
-        function readPoints(el) {
-            var raw = el.getAttribute('data-points') || '';
-            if (!raw) return [];
-            return raw.split(',').map(function (n) { return parseFloat(n) || 0; });
-        }
-        function renderAllSparks() {
-            var sparks = document.querySelectorAll('.ahcfree-mbox-spark-wrap[data-spark]');
-            sparks.forEach(function (el) {
-                var type = el.getAttribute('data-spark');
-                if (type === 'search') {
-                    var total = parseInt(el.getAttribute('data-total') || '0', 10) || 0;
-                    var today = parseInt(el.getAttribute('data-today') || '0', 10) || 0;
-                    if (total > 0) {
-                        var startVal = total - today; if (startVal < 0) startVal = 0;
-                        var pts = [];
-                        for (var i = 0; i < 7; i++) { pts.push(startVal + (today * (i / 6))); }
-                        drawSpark(el, pts);
-                    }
-                } else {
-                    drawSpark(el, readPoints(el));
-                }
-            });
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', renderAllSparks);
-        } else {
-            renderAllSparks();
-        }
-        setTimeout(renderAllSparks, 500);
-        setTimeout(renderAllSparks, 1500);
-    })();
-    </script>
 
 
     <!-- Traffic Chart in admin page -->
@@ -732,9 +914,84 @@ $mystart_date = $mystart_date->format('Y-m-d');
             <div class="panel" style="width:100% !important">
 
                 <div class="panelcontent" style="width:100% !important">
-                    <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo esc_url(plugins_url('images/geomap_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
-                    </a>
+                    <?php
+                    $ahcfree_map_visitors = function_exists('ahcfree_get_today_visitors_for_map') ? ahcfree_get_today_visitors_for_map() : array();
+                    $ahcfree_map_points = array();
+                    if (isset($ahcfree_map_visitors['data']) && is_array($ahcfree_map_visitors['data'])) {
+                        foreach ($ahcfree_map_visitors['data'] as $mp) {
+                            if (!empty($mp['ctr_latitude']) && !empty($mp['ctr_longitude'])) {
+                                $ahcfree_map_points[] = array(
+                                    'lat'  => (float) $mp['ctr_latitude'],
+                                    'lng'  => (float) $mp['ctr_longitude'],
+                                    'name' => $mp['ctr_name'],
+                                    'code' => strtolower($mp['ctr_internet_code']),
+                                    'cnt'  => intval($mp['visitors']),
+                                );
+                            }
+                        }
+                    }
+                    ?>
+                    <div id="ahcfree_visitor_map" style="width:100%; height:430px; border-radius:0 0 7px 7px; z-index:0;"></div>
+                    <script>
+                        (function () {
+                            var ahcfreeMapPoints = <?php echo wp_json_encode($ahcfree_map_points); ?>;
+                            var ahcfreeFlagBase = "<?php echo esc_js(plugins_url('images/flags/', AHCFREE_PLUGIN_MAIN_FILE)); ?>";
+                            var ahcfreeMarkerIcon = "<?php echo esc_js(plugins_url('images/marker-icon.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>";
+                            var ahcfreeMarkerIcon2x = "<?php echo esc_js(plugins_url('images/marker-icon-2x.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>";
+                            var ahcfreeMarkerShadow = "<?php echo esc_js(plugins_url('images/marker-shadow.png', AHCFREE_PLUGIN_MAIN_FILE)); ?>";
+
+                            function ahcfreeInitMap() {
+                                if (typeof L === "undefined") { return; }
+                                var el = document.getElementById("ahcfree_visitor_map");
+                                if (!el || el._ahcfreeInit) { return; }
+                                el._ahcfreeInit = true;
+
+                                var map = L.map("ahcfree_visitor_map", {
+                                    center: [20, 0],
+                                    zoom: 2,
+                                    scrollWheelZoom: false,
+                                    worldCopyJump: true
+                                });
+
+                                L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+                                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                                    subdomains: 'abcd',
+                                    maxZoom: 18
+                                }).addTo(map);
+
+                                var icon = L.icon({
+                                    iconUrl: ahcfreeMarkerIcon,
+                                    iconRetinaUrl: ahcfreeMarkerIcon2x,
+                                    shadowUrl: ahcfreeMarkerShadow,
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+
+                                var bounds = [];
+                                ahcfreeMapPoints.forEach(function (p) {
+                                    if (isNaN(p.lat) || isNaN(p.lng)) { return; }
+                                    var flag = p.code ? '<img src="' + ahcfreeFlagBase + p.code + '.png" width="22" height="15" style="vertical-align:middle;margin-right:6px;border-radius:2px;" onerror="this.style.display=\'none\'" />' : '';
+                                    var popup = '<div style="font-size:13px;">' + flag + '<strong>' + p.name + '</strong> &nbsp;(' + p.cnt + ')</div>';
+                                    L.marker([p.lat, p.lng], { icon: icon }).addTo(map).bindPopup(popup);
+                                    bounds.push([p.lat, p.lng]);
+                                });
+
+                                if (bounds.length > 0) {
+                                    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 5 });
+                                }
+
+                                setTimeout(function () { map.invalidateSize(); }, 200);
+                            }
+
+                            if (document.readyState === "loading") {
+                                document.addEventListener("DOMContentLoaded", ahcfreeInitMap);
+                            } else {
+                                ahcfreeInitMap();
+                            }
+                        })();
+                    </script>
                 </div>
             </div>
         </div>
@@ -904,7 +1161,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                         <input type="button" class="button button-primary clear_form" value="Clear" />
                     </form>
                 </div>
-                <div class="panelcontent" style="width:100% !important">
+                <div class="panelcontent" style="width:100% !important; min-height:280px;">
 
                     <!-- Modal -->
                     <div class="modal fade" id="DayHitsModal" role="dialog" tabindex="-1">
@@ -964,9 +1221,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                 </h2>
 
                 <div class="panelcontent" style="width:100% !important">
-                    <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo plugins_url('images/today_traffic_by_country_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE) ?>">
-                    </a>
+                    <?php ahcfree_render_locked_country_panel('today'); ?>
                 </div>
 
             </div>
@@ -1029,9 +1284,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
             <div class="panel" style="width:100% !important">
                 <h2 class="box-heading" style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">Traffic by country</h2>
                 <div class="panelcontent" style="width:100% !important">
-                    <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo esc_url(plugins_url('images/traffic_by_country_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
-                    </a>
+                    <?php ahcfree_render_locked_country_panel('all'); ?>
                 </div>
             </div>
 
@@ -1043,9 +1296,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                 <h2 class="box-heading" style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">Top Referring Countries</h2>
 
                 <div class="panelcontent" style="width:100% !important">
-                    <a target="_blank" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
-                        <img width="99%" src="<?php echo esc_url(plugins_url('images/top_refferring_countries_pro.jpg', AHCFREE_PLUGIN_MAIN_FILE)); ?>">
-                    </a>
+                    <?php ahcfree_render_locked_country_panel('referring'); ?>
                 </div>
 
             </div>
@@ -1099,7 +1350,16 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <?php
                     if ($norecord == "1") {
                     ?>
-                        <div class="no-record">No data available.</div>
+                        <div class="vtrts-empty">
+                            <div class="vtrts-empty__icon">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07L11.5 4.5" stroke="#2271b1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07L12.5 19.5" stroke="#2271b1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="vtrts-empty__title">No referring sites yet</div>
+                            <div class="vtrts-empty__text">When visitors arrive from other websites, you&rsquo;ll see which sites send you the most traffic here.</div>
+                        </div>
                     <?php
                     }
                     ?>
@@ -1333,9 +1593,20 @@ $mystart_date = $mystart_date->format('Y-m-d');
                             </tbody>
                         <?php
                         }
-
                         ?>
                     </table>
+                    <?php if (count($lastSearchKeyWordsUsed) === 0) : ?>
+                        <div class="vtrts-empty">
+                            <div class="vtrts-empty__icon">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="7" stroke="#2271b1" stroke-width="1.8"/>
+                                    <path d="M21 21l-4.3-4.3" stroke="#2271b1" stroke-width="1.8" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="vtrts-empty__title">No search keywords yet</div>
+                            <div class="vtrts-empty__text">When visitors reach your site by searching on Google or Bing, the keywords they used will show up here.</div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1349,13 +1620,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                 style="width:100% !important; border-radius: 7px !important;  border: 0 !important; box-shadow: 0 4px 25px 0 rgb(168 180 208 / 10%) !important;">
                 <h2 class="box-heading"
                     style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">
-                    Traffic Sources<span class="search_data"><a href="#" class="dashicons dashicons-search"
-                            title="Search"></a></span><span class="export_data">
-                        <a href="#" class="dashicons dashicons-media-spreadsheet" title="Export to Excel"></a>
-                    </span></h2>
-                <a href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&footer=true" target="_blank">
-                    <img src="<?php echo plugin_dir_url(__FILE__); ?>images/sourcetype.jpg" style="width:100%">
-                </a>
+                    Traffic Sources</h2>
                 <div style="display:none;"
                     class="search-panel <?php echo (isset($_POST['section']) && $_POST['section'] == "traffic_sources") ? "open" : ''; ?>">
                     <form method="post" class="search_frm">
@@ -1373,15 +1638,15 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     </form>
                 </div>
                 <?php
-                // Get the traffic sources data for display
-                $trafficSources = ahcfree_get_traffic_sources_for_display(
-                    isset($_POST['from_dt']) ? ahc_free_sanitize_text_or_array_field($_POST['from_dt']) : '',
-                    isset($_POST['to_dt']) ? ahc_free_sanitize_text_or_array_field($_POST['to_dt']) : ''
-                );
+                // Traffic Sources is a Pro feature shown as a blurred sample;
+                // no real data is fetched here.
+                $trafficSources = array();
                 ?>
-                <div class="panelcontent" style="border-radius:0 0 7px 7px !important; padding-right: 50px; display:none;">
+                <div class="panelcontent" style="border-radius:0 0 7px 7px !important; padding-right: 50px;">
 
-                    <table width="100%" border="0" cellspacing="0" id="traffic_sources_table">
+                    <div class="vtrts-locked">
+                        <div class="vtrts-locked__data" aria-hidden="true">
+                    <table width="100%" border="0" cellspacing="0" id="traffic_sources_locked">
                         <thead>
                             <tr>
                                 <th width="5%">Rank</th>
@@ -1393,7 +1658,9 @@ $mystart_date = $mystart_date->format('Y-m-d');
                         </thead>
                         <tbody>
                             <?php
-                            if (is_array($trafficSources) && count($trafficSources) > 0) {
+                            // Always use SAMPLE data here — never real figures —
+                            // because the blur can be removed client-side.
+                            if (false) {
                                 foreach ($trafficSources as $source) {
                             ?>
                                     <tr>
@@ -1434,17 +1701,61 @@ $mystart_date = $mystart_date->format('Y-m-d');
                                 <?php
                                 }
                             } else {
+                                // Representative sample so the locked panel never looks empty.
+                                $vtrts_src_sample = array(
+                                    array('Direct Traffic', 87, 64, 'DIRECT'),
+                                    array('google.com', 23, 17, 'REFERRAL'),
+                                    array('facebook.com', 12, 9, 'REFERRAL'),
+                                    array('t.co', 6, 4, 'REFERRAL'),
+                                    array('bing.com', 4, 3, 'REFERRAL'),
+                                    array('linkedin.com', 3, 2, 'REFERRAL'),
+                                );
+                                $vtrts_src_rank = 1;
+                                foreach ($vtrts_src_sample as $s) {
                                 ?>
                                 <tr>
-                                    <td colspan="5" class="values" style="text-align:center; color:#666; padding:20px;">
-                                        No traffic sources data available
+                                    <td class="values"><?php echo intval($vtrts_src_rank); ?></td>
+                                    <td class="values">
+                                        <span class="traffic-source-item">
+                                            <span class="source-name"><?php echo esc_html($s[0]); ?></span>
+                                        </span>
+                                    </td>
+                                    <td class="values"><?php echo number_format($s[1]); ?></td>
+                                    <td class="values">
+                                        <div class="traffic-percentage-container">
+                                            <div class="visitorsGraphContainer">
+                                                <div class="<?php echo ($s[2] > 50 ? 'visitorsGraph3' : ($s[2] > 25 ? 'visitorsGraph2' : 'visitorsGraph')); ?>" style="width: <?php echo intval($s[2]); ?>%;">
+                                                    &nbsp;(<?php echo intval($s[2]); ?>)%</div>
+                                                <div class="cleaner"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="values">
+                                        <span class="source-type <?php echo strtolower($s[3]); ?>"><?php echo esc_html($s[3]); ?></span>
                                     </td>
                                 </tr>
-                            <?php
+                                <?php
+                                    $vtrts_src_rank++;
+                                }
                             }
                             ?>
                         </tbody>
                     </table>
+                        </div>
+                        <div class="vtrts-locked__overlay">
+                            <div class="vtrts-locked__lock">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="5" y="11" width="14" height="9" rx="2" stroke="#fff" stroke-width="2"/>
+                                    <path d="M8 11V8a4 4 0 018 0v3" stroke="#fff" stroke-width="2"/>
+                                </svg>
+                            </div>
+                            <div class="vtrts-locked__headline">See where your traffic comes from</div>
+                            <div class="vtrts-locked__subline">Pro reveals every traffic source &mdash; direct, search, social and referrals &mdash; with full history.</div>
+                            <a class="vtrts-locked__btn" target="_blank" rel="noopener" href="https://www.wp-buy.com/product/visitors-traffic-real-time-statistics-pro/?attribute_license=Single%20License%2029$&box=true">
+                                Unlock with Pro
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1841,6 +2152,27 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <?php echo ahcfree_get_browsers_hits_counts(); ?>
                 ]);
 
+                var brsContainer = document.getElementById('brsPiechartContainer');
+
+                // With only a single browser (or none), a pie chart is not
+                // meaningful yet, so show a friendly empty state instead.
+                if (data.getNumberOfRows() <= 1) {
+                    if (brsContainer) {
+                        brsContainer.style.height = 'auto';
+                        brsContainer.innerHTML =
+                            '<div class="vtrts-empty">' +
+                            '<div class="vtrts-empty__icon">' +
+                            '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                            '<circle cx="12" cy="12" r="9" stroke="#2271b1" stroke-width="1.8"/>' +
+                            '<path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" stroke="#2271b1" stroke-width="1.4"/>' +
+                            '</svg></div>' +
+                            '<div class="vtrts-empty__title">No browsers data yet</div>' +
+                            '<div class="vtrts-empty__text">Once visitors arrive using different browsers, you&rsquo;ll see the breakdown by browser here.</div>' +
+                            '</div>';
+                    }
+                    return;
+                }
+
                 var options = {
                     title: '',
                     slices: {
@@ -1859,12 +2191,9 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     },
                 };
 
-                var chart = new google.visualization.PieChart(document.getElementById('brsPiechartContainer'));
+                var chart = new google.visualization.PieChart(brsContainer);
                 chart.draw(data, options);
             }
-
-
-
         }
 
         function drawSrhEngVstLineChart() {
@@ -1884,6 +2213,27 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
                     <?php echo ahcfree_get_serch_visits_by_date(); ?>
                 ]);
+
+                var srhContainer = document.getElementById('srhEngBieChartContainer');
+
+                // No search-engine traffic yet: show a friendly message instead
+                // of an empty chart so the panel doesn't look broken.
+                if (data.getNumberOfRows() === 0) {
+                    if (srhContainer) {
+                        srhContainer.style.height = 'auto';
+                        srhContainer.innerHTML =
+                            '<div class="vtrts-empty">' +
+                            '<div class="vtrts-empty__icon">' +
+                            '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                            '<circle cx="11" cy="11" r="7" stroke="#2271b1" stroke-width="1.8"/>' +
+                            '<path d="M21 21l-4.3-4.3" stroke="#2271b1" stroke-width="1.8" stroke-linecap="round"/>' +
+                            '</svg></div>' +
+                            '<div class="vtrts-empty__title">No search engine visits yet</div>' +
+                            '<div class="vtrts-empty__text">Once visitors find your site through Google, Bing or other search engines, the breakdown will appear here.</div>' +
+                            '</div>';
+                    }
+                    return;
+                }
 
                 var options = {
                     title: '',

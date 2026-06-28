@@ -2,8 +2,8 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 6.9.1
-Stable tag: 8.8
+Tested up to: 7.0
+Stable tag: 8.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,17 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.9.1 =
+1. Security fixes and general performance improvements
+2. Country, region and city are now detected from a local GeoIP database (MaxMind GeoLite2) instead of external API calls, fixing slowdowns and server overload on busy sites
+
+
+= 8.9 =
+1. Country, region and city are now detected from a local GeoIP database (MaxMind GeoLite2) instead of external API calls, fixing slowdowns and server overload on busy sites
+2. New Geolocation settings tab with auto-download and monthly auto-update of the database
+3. Fixed IPv6 addresses not showing in visitor reports
+4. Security fixes and general performance improvements
 
 = 8.8 =
 1. Refreshed the dashboard with new summary boxes and trend indicators

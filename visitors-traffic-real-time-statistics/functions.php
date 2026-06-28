@@ -730,6 +730,20 @@ function ahcfree_savesettings()
             update_option('ahcproUserRoles', $ahcproUserRoles_);
         }
 
+        // --- Geolocation settings ---------------------------------------
+        $geo_enabled  = isset($_POST['ahcfree_geoip_enabled']) ? '1' : '0';
+        $geo_fallback = isset($_POST['ahcfree_geoip_ext_fallback']) ? '1' : '0';
+        update_option('ahcfree_geoip_enabled', $geo_enabled);
+        update_option('ahcfree_geoip_ext_fallback', $geo_fallback);
+
+        if (isset($_POST['ahcfree_geoip_account_id'])) {
+            update_option('ahcfree_geoip_account_id', sanitize_text_field(wp_unslash($_POST['ahcfree_geoip_account_id'])));
+        }
+        if (isset($_POST['ahcfree_geoip_license_key'])) {
+            update_option('ahcfree_geoip_license_key', sanitize_text_field(wp_unslash($_POST['ahcfree_geoip_license_key'])));
+        }
+        // ----------------------------------------------------------------
+
         ahcfree_update_tables();
         $post_id = $wpdb->get_results("SELECT `set_id` FROM `ahc_settings` WHERE `site_id` =" . get_current_blog_id());
         if (empty($post_id)) {
@@ -2829,12 +2843,27 @@ function ahcfree_get_vsitors_by_country($all, $cnt = true, $start = '', $limit =
 
 function ahcfree_haship($ip)
 {
-    if ($ip != '') {
-        $ip = explode('.', $ip);
-        return $ip[0] . "." . $ip[1] . "." . $ip[2] . ".***";
-    } else {
+    if ($ip === '' || $ip === null) {
         return '';
     }
+
+    // IPv6: mask the trailing groups for privacy.
+    if (strpos($ip, ':') !== false) {
+        $groups = explode(':', $ip);
+        if (count($groups) > 3) {
+            $groups = array_slice($groups, 0, 3);
+            return implode(':', $groups) . ':***';
+        }
+        return $ip;
+    }
+
+    // IPv4: mask the last octet.
+    $parts = explode('.', $ip);
+    if (count($parts) === 4) {
+        return $parts[0] . "." . $parts[1] . "." . $parts[2] . ".***";
+    }
+
+    return $ip;
 }
 //--------------------------------------------
 /**
@@ -2911,13 +2940,15 @@ function ahcfree_get_recent_visitors($all, $cnt = true, $start = '', $limit = ''
         $c = 0;
         if (is_array($results)) {
             foreach ($results as $hit) {
-                if (strlen($hit->vtr_ip_address) < 17) {
+                if (true) {
                     $visitDate = new DateTime($hit->vtr_date . ' ' . $hit->vtr_time);
 
                     $arr[$c]['hit_id'] = $hit->vtr_id;
                     $hit_referer = (parse_url($hit->vtr_referer, PHP_URL_HOST) == $_SERVER['SERVER_NAME']) ? '' : rawurldecode($hit->vtr_referer);
                     $hitip = (!empty($hit->hit_referer) ? '<a href="' . esc_url($hit_referer) . '" target="_blank"><img src="' . esc_url(plugins_url('images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) . '" title="' . esc_attr(ahc_view_referer) . '"></a>' : '');
-                    $arr[$c]['hit_ip_address'] = (get_option('ahcfree_ahcfree_haships') != '1') ? $hit->vtr_ip_address . "&nbsp;" . $hitip : ahcfree_haship($hit->vtr_ip_address) . "&nbsp;" . $hitip;
+                    $raw_ip = (get_option('ahcfree_ahcfree_haships') != '1') ? $hit->vtr_ip_address : ahcfree_haship($hit->vtr_ip_address);
+                    $ip_cell = '<span class="ahcfree-ip-cell" title="' . esc_attr($raw_ip) . '" style="display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">' . esc_html($raw_ip) . '</span>';
+                    $arr[$c]['hit_ip_address'] = $ip_cell . "&nbsp;" . $hitip;
                     $img = "";
                     if ($hit->ctr_internet_code != '') {
                         $imgurl = plugins_url('images/flags/' . strtolower($hit->ctr_internet_code) . '.png', AHCFREE_PLUGIN_MAIN_FILE);
@@ -3455,8 +3486,10 @@ function ahcfree_get_traffic_by_title($all, $cnt = false, $start = '0', $limit =
 
 
     $cond = "";
+    $search_like = '';
     if ($search != '') {
-        $cond = " and til_page_title like '%" . $search . "%'";
+        $search_like = '%' . $wpdb->esc_like($search) . '%';
+        $cond = " and til_page_title like %s";
     }
 
     if ($cnt == true) {
@@ -3465,7 +3498,11 @@ function ahcfree_get_traffic_by_title($all, $cnt = false, $start = '0', $limit =
 			GROUP BY til_page_id , til_page_title, til_hits
 			ORDER BY til_hits DESC limit %d, %d";
 
-        $count = $wpdb->get_results($wpdb->prepare($sql2, $start, $limit));
+        if ($search_like !== '') {
+            $count = $wpdb->get_results($wpdb->prepare($sql2, $search_like, $start, $limit));
+        } else {
+            $count = $wpdb->get_results($wpdb->prepare($sql2, $start, $limit));
+        }
         return   $wpdb->num_rows;
     }
 
@@ -3485,7 +3522,11 @@ function ahcfree_get_traffic_by_title($all, $cnt = false, $start = '0', $limit =
     if ($result1 !== false && $sql2 != '') {
         $total = $result1[0]->sm;
 
-        $result2 = $wpdb->get_results($wpdb->prepare($sql2, $start, $limit));
+        if ($search_like !== '') {
+            $result2 = $wpdb->get_results($wpdb->prepare($sql2, $search_like, $start, $limit));
+        } else {
+            $result2 = $wpdb->get_results($wpdb->prepare($sql2, $start, $limit));
+        }
         if ($result2 !== false) {
             $arr = array();
             if ($wpdb->num_rows > 0) {
@@ -3796,6 +3837,13 @@ function ahcfree_include_scripts()
 
 
     wp_enqueue_script('jquery-ui-datepicker', array('jquery'));
+
+    /* Leaflet map (free visitor map) */
+    wp_register_style('ahc_leaflet_css', plugins_url('css/leaflet.css', AHCFREE_PLUGIN_MAIN_FILE), '', '1.4.0');
+    wp_enqueue_style('ahc_leaflet_css');
+    wp_register_script('ahc_leaflet_js', plugins_url('js/leaflet.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.4.0', true);
+    wp_enqueue_script('ahc_leaflet_js');
+
     wp_register_script('ahc_main_js', plugins_url('js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), '', '3.0');
     wp_enqueue_script('ahc_main_js');
 
@@ -4514,10 +4562,6 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
 
         if (is_array($results)) {
             foreach ($results as $hit) {
-                // Skip invalid IPs
-                if (strlen($hit->vtr_ip_address) >= 17) {
-                    continue;
-                }
 
                 $visitDate = new DateTime($hit->vtr_date . ' ' . $hit->vtr_time);
 
@@ -4545,7 +4589,8 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
                 }
 
                 $arr[$c]['hit_id'] = $hit->vtr_id;
-                $arr[$c]['hit_ip_address'] = $display_ip . "&nbsp;" . $hitip;
+                $ip_cell = '<span class="ahcfree-ip-cell" title="' . esc_attr($display_ip) . '" style="display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">' . esc_html($display_ip) . '</span>';
+                $arr[$c]['hit_ip_address'] = $ip_cell . "&nbsp;" . $hitip;
 
                 // Process country flag
                 $img = "";

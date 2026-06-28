@@ -17,6 +17,9 @@ class WPHitsCounter
 	var $countryId;
 	var $keyWords;
 	var $requestUri;
+	var $resolvedCity = '';
+	var $resolvedRegion = '';
+	var $geoResolved = false;
 
 	/**
 
@@ -117,8 +120,6 @@ class WPHitsCounter
 			$this->getBrowser();
 
 			$this->getCountryId();
-
-			usleep(10000);
 
 			if (!empty($this->refererSite)) {
 
@@ -365,32 +366,20 @@ class WPHitsCounter
 	{
 		if (!$this->ipIsUnknown) {
 
-			// First try: ipinfo.io (50,000 requests/month free, no key needed)
-			$ip_data = ahcfree_advanced_get_link("https://ipinfo.io/" . $this->ipAddress . "/country");
-			if ($ip_data && is_string($ip_data) && strlen(trim($ip_data)) == 2) {
-				$this->countryInternetCode = trim($ip_data);
-				return;
-			}
-
-			// Fallback: ipapi.co (30,000 requests/month free, no key needed)
-			$ip_data = ahcfree_advanced_get_link("https://ipapi.co/" . $this->ipAddress . "/country/");
-			if ($ip_data && is_string($ip_data) && strlen(trim($ip_data)) == 2) {
-				$this->countryInternetCode = trim($ip_data);
-				return;
-			}
-
-			// Last resort: Your original APIs
-			$ip_data = ahcfree_advanced_get_link("http://ip-api.com/json/" . $this->ipAddress);
-			$countryCode = isset($ip_data->countryCode) ? $ip_data->countryCode : '';
-			if (trim($countryCode) != '' && strlen($countryCode) == 2) {
-				$this->countryInternetCode = $countryCode;
-			} else {
-				$ip_data = ahcfree_advanced_get_link("https://geoip-db.com/json/" . $this->ipAddress);
-				$this->countryInternetCode = isset($ip_data->country_code) ? $ip_data->country_code : '';
-				if (empty($ip_data->country_code)) {
-					$ip_data = ahcfree_advanced_get_link("http://www.geoplugin.net/json.gp?ip=" . $this->ipAddress);
-					$this->countryInternetCode = isset($ip_data->geoplugin_countryCode) ? $ip_data->geoplugin_countryCode : '';
+			// Resolve via the local GeoIP module (Cloudflare header -> permanent
+			// DB cache -> local .mmdb -> optional single external fallback).
+			// This replaces the old chain of up to 5 synchronous external API
+			// calls per visitor, which was the cause of the server overload.
+			if (function_exists('ahcfree_geo_lookup')) {
+				$geo = ahcfree_geo_lookup($this->ipAddress);
+				if (!empty($geo['country_code']) && strlen($geo['country_code']) === 2) {
+					$this->countryInternetCode = $geo['country_code'];
 				}
+				// Stash city/region so updateRecentVisitors() reuses them
+				// without performing a second lookup.
+				$this->resolvedCity   = isset($geo['city']) ? $geo['city'] : '';
+				$this->resolvedRegion = isset($geo['region']) ? $geo['region'] : '';
+				$this->geoResolved    = true;
 			}
 		}
 
@@ -859,51 +848,25 @@ class WPHitsCounter
 		$ahc_city = '';
 		$ahc_region = '';
 
-		// Performance: Use only 2 APIs - primary and fallback
-		$apis = array(
-			// Primary: ipapi.co - Fast, reliable, 1000 requests/day free
-			array(
-				'url' => "https://ipapi.co/{$vtr_ip_address}/json/",
-				'city_field' => 'city',
-				'region_field' => 'region',
-				'timeout' => 3 // Quick timeout for performance
-			),
-			// Fallback: ip-api.com - Fast, reliable, unlimited free (non-commercial)
-			array(
-				'url' => "http://ip-api.com/json/{$vtr_ip_address}",
-				'city_field' => 'city',
-				'region_field' => 'regionName',
-				'timeout' => 5 // Slightly longer timeout for fallback
-			)
-		);
+		// Reuse the city/region already resolved in getCountryInternetCode()
+		// via the local GeoIP module. This avoids a SECOND set of external
+		// API calls per visitor (the old code called ipapi.co + ip-api.com
+		// here on top of the country lookup, compounding the server load).
+		if ($this->geoResolved) {
+			$ahc_city   = $this->resolvedCity;
+			$ahc_region = $this->resolvedRegion;
+		} elseif (function_exists('ahcfree_geo_lookup')) {
+			$geo = ahcfree_geo_lookup($vtr_ip_address);
+			$ahc_city   = isset($geo['city']) ? $geo['city'] : '';
+			$ahc_region = isset($geo['region']) ? $geo['region'] : '';
+		}
 
-		// Performance: Try only primary, then fallback if needed
-		foreach ($apis as $api) {
-			try {
-				// Performance: Add timeout to prevent slow responses
-				$ip_data = $this->optimized_get_link($api['url'], $api['timeout']);
-				if (!empty($ip_data)) {
-					$city = isset($ip_data->{$api['city_field']}) ? trim($ip_data->{$api['city_field']}) : '';
-					$region = isset($ip_data->{$api['region_field']}) ? trim($ip_data->{$api['region_field']}) : '';
-					// Performance: If we get valid data, use it and stop
-					if (!empty($city) && $city != 'null' && strlen($city) > 1) {
-						$ahc_city = $city;
-					}
-					if (!empty($region) && $region != 'null' && strlen($region) > 1) {
-						$ahc_region = $region;
-					}
-					// Performance: If we got city data, we're done (don't need to try fallback)
-					if (!empty($ahc_city)) {
-						break;
-					}
-				}
-			} catch (Exception $e) {
-				// Performance: Log error only in debug mode to avoid overhead
-				if (defined('WP_DEBUG') && WP_DEBUG) {
-					error_log("Geolocation API error for {$api['url']}: " . $e->getMessage());
-				}
-				continue;
-			}
+		// Defensive cleanup of placeholder values.
+		if ($ahc_city === 'null' || strlen($ahc_city) < 2) {
+			$ahc_city = '';
+		}
+		if ($ahc_region === 'null' || strlen($ahc_region) < 2) {
+			$ahc_region = '';
 		}
 
 		// Performance: Use prepared statement with proper placeholders
@@ -946,7 +909,7 @@ class WPHitsCounter
 			),
 			'compress' => true,
 			'decompress' => true,
-			'sslverify' => false // Performance: Skip SSL verification for speed (consider security implications)
+			'sslverify' => true // Security: verify SSL certificates
 		);
 
 		$response = wp_remote_get($url, $args);
