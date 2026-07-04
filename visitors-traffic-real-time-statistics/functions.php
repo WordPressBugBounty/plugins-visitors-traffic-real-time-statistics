@@ -4696,7 +4696,7 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
 
                         // Debug log
                         if (defined('WP_DEBUG') && WP_DEBUG) {
-                            error_log(sprintf(
+                          /*  error_log(sprintf(
                                 '[ahcfree dur] ip=%s first_local=%s last_local=%s last_hb=%s from_hits=%d from_hb=%d',
                                 $hit->vtr_ip_address,
                                 $first_hit_local,
@@ -4704,7 +4704,7 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
                                 $last_heartbeat_local ?: 'none',
                                 $from_hits,
                                 $from_heartbeat
-                            ));
+                            ));*/
                         }
                     }
 
@@ -5121,10 +5121,10 @@ function ahcfree_heartbeat_received($response, $data)
 
     // Debug log — يمكن حذفه لاحقاً بعد التأكد
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log(sprintf(
+       /* error_log(sprintf(
             '[ahcfree heartbeat] ip=%s site=%d rows_updated=%d last_error=%s',
             $ip, $site_id, (int) $updated, $wpdb->last_error
-        ));
+        ));*/
     }
 
     // نضيف معلومات تشخيص في الـ response (يظهر في Network → Response)

@@ -1238,7 +1238,7 @@ class WPHitsCounter
 			'timezone' => 'UTC'
 		);
 
-		error_log('Storing in UTC: ' . json_encode($result));
+		//error_log('Storing in UTC: ' . json_encode($result));
 		return $result;
 	}
 	
