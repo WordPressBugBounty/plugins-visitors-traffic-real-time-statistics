@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 7.0
-Stable tag: 8.10
+Stable tag: 8.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,12 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.11 =
+1. Fixed visitor tracking sometimes failing with a 400 (Bad Request) error on pages whose title or referrer contained special characters; all tracking values are now properly URL-encoded
+2. Front-end tracking script is now versioned so browsers always load the latest version after an update
+3. Visitor map now stretches to fill the space next to the statistics panel, removing the empty gap below it
+4. Side-by-side dashboard panels now share the same height, removing uneven gaps below shorter panels (including the visitors list next to the country panel)
 
 = 8.10 =
 1. performance improvements

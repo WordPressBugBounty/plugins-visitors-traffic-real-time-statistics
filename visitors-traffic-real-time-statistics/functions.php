@@ -1186,7 +1186,7 @@ function ahcfree_enqueue_scripts()
     wp_enqueue_script('heartbeat');
 
     // front.js يعتمد على jquery و heartbeat (يُحمَّل بعدهما)
-    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), array('jquery', 'heartbeat'), '', true);
+    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), array('jquery', 'heartbeat'), AHCFREE_VERSION, true);
     wp_enqueue_script('ahc_front_js');
 
     wp_localize_script('ahc_front_js', 'ahc_ajax_front', array(

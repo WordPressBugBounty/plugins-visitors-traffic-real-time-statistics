@@ -14,7 +14,15 @@ var xhttp = new XMLHttpRequest();
 
 xhttp.open("POST", ahc_ajax_front.ajax_url, true);
 xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-xhttp.send("action=ahcfree_track_visitor&page_id="+ page_id +"&page_title="+ page_title + "&post_type="+ post_type + "&referer="+ referer +"&useragent="+ useragent +"&servername="+ servername +"&hostname="+ hostname +"&request_uri="+request_uri);
+xhttp.send("action=ahcfree_track_visitor" +
+    "&page_id=" + encodeURIComponent(page_id) +
+    "&page_title=" + encodeURIComponent(page_title) +
+    "&post_type=" + encodeURIComponent(post_type) +
+    "&referer=" + encodeURIComponent(referer) +
+    "&useragent=" + encodeURIComponent(useragent) +
+    "&servername=" + encodeURIComponent(servername) +
+    "&hostname=" + encodeURIComponent(hostname) +
+    "&request_uri=" + encodeURIComponent(request_uri));
 
 // ============================================================
 // WordPress Heartbeat API integration

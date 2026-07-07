@@ -152,6 +152,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
         overflow: hidden;
         border-radius: 0 0 7px 7px;
         min-height: 280px;
+        flex: 1 1 auto;
     }
     .vtrts-locked__data {
         filter: blur(2px);
@@ -386,7 +387,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
             <style>
                 #vtrts_subscribe {
                     position: relative;
-                    margin: 5px 0 18px;
+                    margin: 5px 0 15px;
                     padding: 16px 20px;
                     border: 1px solid #dcdcde;
                     border-left: 4px solid #2271b1;
@@ -909,11 +910,11 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
     <!--  Summary Statistics / Map in admin page -->
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="panel" style="width:100% !important">
+    <div class="row ahcfree-map-row" style="display:flex; flex-wrap:wrap;">
+        <div class="col-lg-8" style="display:flex;">
+            <div class="panel" style="width:100% !important; display:flex; flex-direction:column;">
 
-                <div class="panelcontent" style="width:100% !important">
+                <div class="panelcontent" style="width:100% !important; flex:1 1 auto; display:flex; flex-direction:column;">
                     <?php
                     $ahcfree_map_visitors = function_exists('ahcfree_get_today_visitors_for_map') ? ahcfree_get_today_visitors_for_map() : array();
                     $ahcfree_map_points = array();
@@ -931,7 +932,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                         }
                     }
                     ?>
-                    <div id="ahcfree_visitor_map" style="width:100%; height:430px; border-radius:0 0 7px 7px; z-index:0;"></div>
+                    <div id="ahcfree_visitor_map" style="width:100%; flex:1 1 auto; min-height:430px; border-radius:0 0 7px 7px; z-index:0;"></div>
                     <script>
                         (function () {
                             var ahcfreeMapPoints = <?php echo wp_json_encode($ahcfree_map_points); ?>;
@@ -982,7 +983,13 @@ $mystart_date = $mystart_date->format('Y-m-d');
                                     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 5 });
                                 }
 
+                                // The map lives in a flex column, so its final
+                                // height settles after layout — refresh tiles a
+                                // few times and on resize to avoid grey gaps.
                                 setTimeout(function () { map.invalidateSize(); }, 200);
+                                setTimeout(function () { map.invalidateSize(); }, 600);
+                                setTimeout(function () { map.invalidateSize(); }, 1200);
+                                window.addEventListener("resize", function () { map.invalidateSize(); });
                             }
 
                             if (document.readyState === "loading") {
@@ -1130,9 +1137,9 @@ $mystart_date = $mystart_date->format('Y-m-d');
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="panel" style="width:100% !important">
+    <div class="row ahcfree-eqrow" style="display:flex; flex-wrap:wrap;">
+        <div class="col-lg-8" style="display:flex;">
+            <div class="panel" style="width:100% !important; display:flex; flex-direction:column;">
                 <h2 class="box-heading"
                     style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">
                     Recent visitors by IP<span class="search_data"><a href="#" class="dashicons dashicons-search"
@@ -1161,7 +1168,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                         <input type="button" class="button button-primary clear_form" value="Clear" />
                     </form>
                 </div>
-                <div class="panelcontent" style="width:100% !important; min-height:280px;">
+                <div class="panelcontent" style="width:100% !important; min-height:280px; flex:1 1 auto;">
 
                     <!-- Modal -->
                     <div class="modal fade" id="DayHitsModal" role="dialog" tabindex="-1">
@@ -1207,8 +1214,8 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
         $countries  = array();
         ?>
-        <div class="col-lg-4">
-            <div class="panel" style="width:100% !important">
+        <div class="col-lg-4" style="display:flex;">
+            <div class="panel" style="width:100% !important; display:flex; flex-direction:column;">
                 <h2 class="box-heading" style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">
                     <?php
                     if (isset($_POST['t_from_dt']) && $_POST['t_from_dt'] != '' && isset($_POST['section']) && $_POST['section'] == "traffic_index_country") {
@@ -1220,7 +1227,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     <span class="search_data"><a href="#" class="dashicons dashicons-search" title="Search"></a></span>
                 </h2>
 
-                <div class="panelcontent" style="width:100% !important">
+                <div class="panelcontent" style="width:100% !important; flex:1 1 auto; display:flex; flex-direction:column;">
                     <?php ahcfree_render_locked_country_panel('today'); ?>
                 </div>
 
@@ -1303,14 +1310,14 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-6">
+    <div class="row ahcfree-eqrow" style="display:flex; flex-wrap:wrap;">
+        <div class="col-lg-6" style="display:flex;">
 
-            <div class="panel" style="width:100% !important">
+            <div class="panel" style="width:100% !important; display:flex; flex-direction:column;">
                 <h2 class="box-heading" style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important"><?php echo ahc_refering_sites ?><span class="export_data">
                         <a href="#" class="dashicons dashicons-media-spreadsheet" title="Export to Excel"></a>
                     </span></h2>
-                <div class="panelcontent" style="width:100% !important">
+                <div class="panelcontent" style="width:100% !important; flex:1 1 auto; min-height:300px;">
                     <table width="95%" tableborder="0" cellspacing="0" id="top_refering_sites">
                         <thead>
                             <tr>
@@ -1370,12 +1377,12 @@ $mystart_date = $mystart_date->format('Y-m-d');
 
 
         <!-- time visits graph begin -->
-        <div class="col-lg-6">
+        <div class="col-lg-6" style="display:flex;">
             <?php
             //$times = ahcfree_get_time_visits();
             $times = array();
             ?>
-            <div class="panel" style="width:100% !important">
+            <div class="panel" style="width:100% !important; display:flex; flex-direction:column;">
                 <h2 class="box-heading"
                     style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">
                     Visits Time Graph
@@ -1452,14 +1459,14 @@ $mystart_date = $mystart_date->format('Y-m-d');
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-6">
+    <div class="row ahcfree-eqrow" style="display:flex; flex-wrap:wrap;">
+        <div class="col-lg-6" style="display:flex;">
             <?php
             // $tTitles = ahcfree_get_traffic_by_title();
             $tTitles = array();
             ?>
             <div class="panel"
-                style="width:100% !important; border-radius: 7px !important; border: 0 !important; box-shadow: 0 4px 25px 0 rgb(168 180 208 / 10%) !important;">
+                style="width:100% !important; border-radius: 7px !important; border: 0 !important; box-shadow: 0 4px 25px 0 rgb(168 180 208 / 10%) !important; display:flex; flex-direction:column;">
                 <h2 class="box-heading"
                     style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important">
                     Traffic by Title
@@ -1469,7 +1476,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
                     </span>
                 </h2>
 
-                <div class="panelcontent" style="border-radius:0 0 7px 7px !important; padding-right: 50px;">
+                <div class="panelcontent" style="border-radius:0 0 7px 7px !important; padding-right: 50px; flex:1 1 auto; min-height:300px;">
                     <!-- Modal - matching Recent Visitors style -->
                     <div class="modal fade" id="TrafficStatsModal" role="dialog" tabindex="-1">
                         <br>
@@ -1525,7 +1532,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
             </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-6" style="display:flex;">
             <?php
             /*$lastSearchKeyWordsUsed = ahcfree_get_latest_search_key_words_used();*/
             $lastSearchKeyWordsUsed = array();
@@ -1533,7 +1540,7 @@ $mystart_date = $mystart_date->format('Y-m-d');
             {*/
             ?>
             <!-- last search key words used -->
-            <div class="panel" style="width:100% !important">
+            <div class="panel" style="width:100% !important; display:flex; flex-direction:column;">
                 <h2 class="box-heading" style="border-radius: 7px 7px 0 0 !important; padding:12px 15px !important ; border-bottom:0 !important"><?php echo ahc_latest_search_words; ?><span class="search_data"><a href="#" class="dashicons dashicons-search" title="Search"></a></span><span class="export_data">
                         <a href="#" class="dashicons dashicons-media-spreadsheet" title="Export to Excel"></a>
                     </span></h2>
