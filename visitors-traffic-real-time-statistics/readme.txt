@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 7.0
-Stable tag: 8.11
+Stable tag: 8.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,9 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.12 =
+1. Security fix: resolved a reflected XSS vulnerability in the Traffic Sources date filter (from_dt / to_dt) on the statistics page; these values are now properly escaped with esc_attr() before output
 
 = 8.11 =
 1. Fixed visitor tracking sometimes failing with a 400 (Bad Request) error on pages whose title or referrer contained special characters; all tracking values are now properly URL-encoded

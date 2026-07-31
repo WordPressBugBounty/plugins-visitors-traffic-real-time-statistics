@@ -1636,10 +1636,10 @@ $mystart_date = $mystart_date->format('Y-m-d');
                         <input type="hidden" name="section" value="traffic_sources" />
                         <input type="text" readonly="readonly" placeholder="From Date" class="ahc_clear" name="from_dt"
                             id="traffic_from_dt" autocomplete="off"
-                            value="<?php echo isset($_POST['from_dt']) ? ahc_free_sanitize_text_or_array_field($_POST['from_dt']) : ''; ?>" />
+                            value="<?php echo isset($_POST['from_dt']) ? esc_attr(ahc_free_sanitize_text_or_array_field($_POST['from_dt'])) : ''; ?>" />
                         <input type="text" readonly="readonly" placeholder="To Date" class="ahc_clear" name="to_dt"
                             id="traffic_to_dt" autocomplete="off"
-                            value="<?php echo isset($_POST['to_dt']) ? ahc_free_sanitize_text_or_array_field($_POST['to_dt']) : ''; ?>" />
+                            value="<?php echo isset($_POST['to_dt']) ? esc_attr(ahc_free_sanitize_text_or_array_field($_POST['to_dt'])) : ''; ?>" />
                         <input type="submit" class="button button-primary" />
                         <input type="button" class="button button-primary clear_form" value="Clear" />
                     </form>
