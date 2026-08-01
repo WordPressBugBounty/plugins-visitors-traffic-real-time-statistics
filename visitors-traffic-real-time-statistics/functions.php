@@ -1182,11 +1182,15 @@ function ahcfree_enqueue_scripts()
     if (is_archive()) {
         $post_id = get_the_archive_title();
     }
-    // تفعيل WordPress Heartbeat API على الـ frontend أولاً
+    // تفعيل WordPress Heartbeat API على الـ frontend (اختياري لميزة "الأونلاين لايف")
     wp_enqueue_script('heartbeat');
 
-    // front.js يعتمد على jquery و heartbeat (يُحمَّل بعدهما)
-    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), array('jquery', 'heartbeat'), AHCFREE_VERSION, true);
+    // ملاحظة: لا نربط front.js بـ jquery/heartbeat كـ dependencies.
+    // جزء تسجيل الزيارة في front.js يستخدم XMLHttpRequest خام ولا يحتاج jQuery،
+    // بينما جزء الـ Heartbeat ينتظر jQuery داخلياً. ربط الملف بـ jquery كان
+    // يمنع تحميله كلياً على المواقع التي تؤجّل أو تُزيل jQuery (إضافات الأداء)،
+    // فيتوقف التسجيل. إزالة الاعتماد تضمن تحميل التتبّع دائماً.
+    wp_register_script('ahc_front_js', plugins_url('js/front.js', AHCFREE_PLUGIN_MAIN_FILE), array(), AHCFREE_VERSION, true);
     wp_enqueue_script('ahc_front_js');
 
     wp_localize_script('ahc_front_js', 'ahc_ajax_front', array(

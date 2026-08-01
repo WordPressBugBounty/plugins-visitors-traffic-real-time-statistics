@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 7.0
-Stable tag: 8.12
+Stable tag: 8.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,9 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.13 =
+1. Fix: visitor tracking script (front.js) no longer depends on jQuery, so it loads and records visits even on sites that defer or remove jQuery via performance/optimization plugins. This resolves cases where statistics were not being recorded on some sites.
 
 = 8.12 =
 1. Security fix: resolved a reflected XSS vulnerability in the Traffic Sources date filter (from_dt / to_dt) on the statistics page; these values are now properly escaped with esc_attr() before output
