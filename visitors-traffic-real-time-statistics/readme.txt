@@ -2,8 +2,8 @@
 Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
-Tested up to: 7.0
-Stable tag: 8.13
+Tested up to: 7.1
+Stable tag: 8.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,9 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.14 =
+1. Critical fix: on sites running PHP older than 8.1, the tracking request (admin-ajax.php) crashed with a fatal error, so no visits were recorded at all. The bundled geolocation library requires PHP 8.1+; it is now loaded only when the server supports it. On older PHP, visitor country is resolved from the Cloudflare header (if the site is behind Cloudflare) or from a lightweight external lookup, with the result cached to keep tracking fast. Visit recording works on all supported PHP versions again.
 
 = 8.13 =
 1. Fix: visitor tracking script (front.js) no longer depends on jQuery, so it loads and records visits even on sites that defer or remove jQuery via performance/optimization plugins. This resolves cases where statistics were not being recorded on some sites.

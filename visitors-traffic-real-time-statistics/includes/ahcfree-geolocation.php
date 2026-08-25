@@ -146,6 +146,22 @@ function ahcfree_geoip_reader()
     if (!is_file($autoload)) {
         return null;
     }
+
+    // The bundled MaxMind GeoIP2 library uses PHP 8.1+ syntax (readonly
+    // properties). On PHP < 8.1 the mere act of loading these files triggers a
+    // fatal parse error — which cannot be caught with try/catch because it
+    // happens at compile time, not run time. That parse error was crashing the
+    // whole tracking AJAX request (HTTP 500) on older-PHP sites, so NO visits
+    // were recorded. Guard the include behind a version check: on older PHP we
+    // skip the local .mmdb reader entirely and fall back to the other lookup
+    // methods, so tracking keeps working (country may resolve to 'XX').
+    if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[VTRTS] GeoIP2 library requires PHP 8.1+; skipping local reader on PHP ' . PHP_VERSION);
+        }
+        return null;
+    }
+
     require_once $autoload;
 
     if (!class_exists('GeoIp2\\Database\\Reader')) {
@@ -459,8 +475,12 @@ function ahcfree_geo_lookup($ip)
         }
     }
 
-    // 4) Optional single external fallback ONLY if DB missing and nothing yet.
-    if (($result === null || $result['country_code'] === 'XX') && !ahcfree_geoip_db_exists()) {
+    // 4) Optional single external fallback when we couldn't get a country
+    // from the local DB (either because the .mmdb is missing, OR because
+    // the bundled MaxMind reader can't load on this PHP version — see
+    // ahcfree_geoip_reader() for the PHP 8.1 guard).
+    $local_reader_available = (ahcfree_geoip_db_exists() && ahcfree_geoip_reader() !== null);
+    if (($result === null || $result['country_code'] === 'XX') && !$local_reader_available) {
         $ext = ahcfree_geoip_from_external($ip);
         if ($ext !== null) {
             $result = $ext;
