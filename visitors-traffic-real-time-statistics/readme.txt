@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 7.1
-Stable tag: 8.14
+Stable tag: 8.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,13 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.16 =
+1. Security fix: resolved an unauthenticated stored DOM-based Cross-Site Scripting (XSS) vulnerability via the 'X-Real-IP' (and other forwarded-IP) HTTP headers. The visitor IP is now strictly validated as a real IPv4/IPv6 address before it is stored, and all visitor data shown in the IP details popup is escaped before being added to the page.
+2. Visitor map now shows place names in English for all countries (switched to Esri World Street Map tiles, no API key required).
+
+= 8.15 =
+1. Fix: the visitor map on the dashboard showed "API KEY REQUIRED" placeholder tiles instead of the map, because the CARTO basemap service now requires an API key. The map now uses OpenStreetMap tiles, which work without any key.
 
 = 8.14 =
 1. Critical fix: on sites running PHP older than 8.1, the tracking request (admin-ajax.php) crashed with a fatal error, so no visits were recorded at all. The bundled geolocation library requires PHP 8.1+; it is now loaded only when the server supports it. On older PHP, visitor country is resolved from the Cloudflare header (if the site is behind Cloudflare) or from a lightweight external lookup, with the result cached to keep tracking fast. Visit recording works on all supported PHP versions again.

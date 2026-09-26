@@ -3075,7 +3075,7 @@ function ahcfree_get_latest_search_key_words_used($all, $cnt = true, $start = ''
             $arr[$c]['hit_search_words'] = $re->kwd_keywords;
             $arr[$c]['hit_date'] = $re->kwd_date;
             $arr[$c]['hit_time'] = $re->kwd_time;
-            $arr[$c]['hit_ip_address'] = $re->kwd_ip_address;
+            $arr[$c]['hit_ip_address'] = esc_html($re->kwd_ip_address);
             $arr[$c]['ctr_name'] = $re->ctr_name;
             $arr[$c]['ctr_internet_code'] = $re->ctr_internet_code;
             $arr[$c]['bsr_name'] = $re->bsr_name;
@@ -3750,34 +3750,57 @@ function ahc_free_get_simple_ip($ip)
 
 function ahcfree_get_client_ip_address()
 {
-    global $_SERVER;
-    $ipAddress = '';
-    if (isset($_SERVER['HTTP_X_REAL_IP']) && !empty($_SERVER['HTTP_X_REAL_IP']) && $_SERVER['HTTP_X_REAL_IP'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['HTTP_X_REAL_IP'];
-    } else if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
-    } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else if (isset($_SERVER['HTTP_X_FORWARDED']) && !empty($_SERVER['HTTP_X_FORWARDED']) && $_SERVER['HTTP_X_FORWARDED'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['HTTP_X_FORWARDED'];
-    } else if (isset($_SERVER['HTTP_FORWARDED_FOR']) && !empty($_SERVER['HTTP_FORWARDED_FOR']) && $_SERVER['HTTP_FORWARDED_FOR'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['HTTP_FORWARDED_FOR'];
-    } else if (isset($_SERVER['HTTP_FORWARDED']) && !empty($_SERVER['HTTP_FORWARDED'])  && $_SERVER['HTTP_FORWARDED'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['HTTP_FORWARDED'];
-    } else if (isset($_SERVER['REMOTE_ADDR']) && !empty($_SERVER['REMOTE_ADDR'])  && $_SERVER['REMOTE_ADDR'] != '127.0.0.1') {
-        $ipAddress = $_SERVER['REMOTE_ADDR'];
-    } else {
-        $ipAddress = 'UNKNOWN';
+    // Security: every header below can be forged by the client. Only accept a
+    // value that is a syntactically valid IP address, so nothing else
+    // (HTML/JS payloads, HTML entities, garbage) can ever be stored in the DB.
+    $headers = array(
+        'HTTP_X_REAL_IP',
+        'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_FORWARDED',
+        'HTTP_FORWARDED_FOR',
+        'HTTP_FORWARDED',
+        'REMOTE_ADDR',
+    );
+
+    foreach ($headers as $header) {
+        if (empty($_SERVER[$header]) || !is_string($_SERVER[$header])) {
+            continue;
+        }
+
+        // Headers such as X-Forwarded-For may contain a comma separated list.
+        $candidates = explode(',', wp_unslash($_SERVER[$header]));
+        foreach ($candidates as $candidate) {
+            $candidate = trim($candidate);
+            // "Forwarded: for=1.2.3.4" style values.
+            if (stripos($candidate, 'for=') === 0) {
+                $candidate = trim(substr($candidate, 4), " \"[]");
+            }
+            $candidate = ahc_free_get_simple_ip($candidate);
+            $valid = ahcfree_validate_ip($candidate);
+            if ($valid !== '' && $valid !== '127.0.0.1') {
+                return $valid;
+            }
+        }
     }
 
-    $ipAddress = ahc_free_get_simple_ip($ipAddress);
-    $ipAddress = ahc_free_sanitize_text_or_array_field($ipAddress);
+    return 'UNKNOWN';
+}
 
-
-
-    $ipAddress = explode(',', $ipAddress);
-
-    return $ipAddress[0];
+/**
+ * Returns the IP if it is a valid IPv4/IPv6 address, otherwise an empty string.
+ *
+ * @param mixed $ip
+ * @return string
+ */
+function ahcfree_validate_ip($ip)
+{
+    if (!is_string($ip)) {
+        return '';
+    }
+    $ip = trim($ip);
+    $valid = filter_var($ip, FILTER_VALIDATE_IP);
+    return ($valid === false) ? '' : $valid;
 }
 
 //--------------------------------------------
@@ -3848,7 +3871,7 @@ function ahcfree_include_scripts()
     wp_register_script('ahc_leaflet_js', plugins_url('js/leaflet.js', AHCFREE_PLUGIN_MAIN_FILE), '', '1.4.0', true);
     wp_enqueue_script('ahc_leaflet_js');
 
-    wp_register_script('ahc_main_js', plugins_url('js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), '', '3.0');
+    wp_register_script('ahc_main_js', plugins_url('js/ahcfree_js_scripts.js', AHCFREE_PLUGIN_MAIN_FILE), array('jquery'), AHCFREE_VERSION);
     wp_enqueue_script('ahc_main_js');
 
     wp_localize_script('ahc_main_js', 'ahc_ajax', array(
@@ -5102,7 +5125,10 @@ function ahcfree_heartbeat_received($response, $data)
 
     global $wpdb;
 
-    $ip      = sanitize_text_field($data['ahcfree_heartbeat_ip']);
+    $ip      = ahcfree_validate_ip(is_string($data['ahcfree_heartbeat_ip']) ? $data['ahcfree_heartbeat_ip'] : '');
+    if ($ip === '') {
+        return $response;
+    }
     $site_id = get_current_blog_id();
 
     // نستخدم نفس ahcfree_localtime التي يستخدمها INSERT الأصلي

@@ -954,10 +954,10 @@ $mystart_date = $mystart_date->format('Y-m-d');
                                     worldCopyJump: true
                                 });
 
-                                L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-                                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-                                    subdomains: 'abcd',
-                                    maxZoom: 18
+                                // Esri World Street Map: English labels worldwide, no API key required.
+                                L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+                                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS',
+                                    maxZoom: 19
                                 }).addTo(map);
 
                                 var icon = L.icon({

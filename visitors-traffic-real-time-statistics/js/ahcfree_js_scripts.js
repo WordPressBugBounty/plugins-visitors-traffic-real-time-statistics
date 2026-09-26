@@ -1,3 +1,17 @@
+/**
+ * Escape a value for safe insertion into HTML text or a quoted attribute.
+ * Values read from the DB (IP, country, city, browser...) must never be
+ * injected into the DOM unescaped.
+ */
+function ahcfreeEscHtml(value) {
+	return String(value === null || value === undefined ? '' : value)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
+}
+
 
 var colors = ['#DB6946', '#C14543', '#445060', '#395953', '#6C8C80', '#829AB5', '#BF807A', '#BF0000', '#006BB7', '#EC732C', '#BF3D27', '#A6375F',
 	'#8C6D46', '#326149', '#802B35', '#8A3842', '#366D73', '#4D6173', '#4A4659', '#C9D65B', '#F45552', '#F3CC5E', '#F29B88', '#D96941',
@@ -742,12 +756,12 @@ jQuery(document).ready(function () {
 						if (typeof data === 'string' && data.includes('<button')) {
 							var buttonHtml = data;
 							buttonHtml = buttonHtml.replace('<button', '<button ' +
-								'data-time="' + (row.time || '') + '" ' +
-								'data-ctr-name="' + (row.ctr_name || '') + '" ' +
-								'data-ctr-code="' + (row.ctr_internet_code || 'eg') + '" ' +
-								'data-city="' + (row.ahc_city || '') + '" ' +
-								'data-region="' + (row.ahc_region || '') + '" ' +
-								'data-duration="' + (row.duration || '00:00:01') + '" '
+								'data-time="' + ahcfreeEscHtml(row.time || '') + '" ' +
+								'data-ctr-name="' + ahcfreeEscHtml(row.ctr_name || '') + '" ' +
+								'data-ctr-code="' + ahcfreeEscHtml(row.ctr_internet_code || 'eg') + '" ' +
+								'data-city="' + ahcfreeEscHtml(row.ahc_city || '') + '" ' +
+								'data-region="' + ahcfreeEscHtml(row.ahc_region || '') + '" ' +
+								'data-duration="' + ahcfreeEscHtml(row.duration || '00:00:01') + '" '
 							);
 							return buttonHtml;
 						}
@@ -952,6 +966,17 @@ jQuery(document).ready(function () {
 			var locationParts = location.split(', ');
 			var country = locationParts[0] || 'Unknown Country';
 			var city = locationParts[1] || 'Unknown City';
+
+			// Security: all values below come from stored visitor data (partly
+			// from client-controlled HTTP headers) - escape before building HTML.
+			var flagCode = String(flag).toLowerCase().replace(/[^a-z]/g, '').substring(0, 3) || 'eg';
+			ip = ahcfreeEscHtml(ip);
+			time = ahcfreeEscHtml(time);
+			hitdate = ahcfreeEscHtml(hitdate);
+			duration = ahcfreeEscHtml(duration);
+			browser = ahcfreeEscHtml(browser);
+			country = ahcfreeEscHtml(country);
+			city = ahcfreeEscHtml(city);
 			
 			// Build modal content with all data already available
 			var headerHtml = `
@@ -1017,7 +1042,7 @@ jQuery(document).ready(function () {
 				}
 			  </style>
 			  <div class="visitor-header-enhanced">
-				<img class="flag" src="https://flagcdn.com/w40/${flag.toLowerCase()}.png" alt="flag" width="32" height="24" />
+				<img class="flag" src="https://flagcdn.com/w40/${flagCode}.png" alt="flag" width="32" height="24" />
 				<div class="city-country">${city}, ${country}</div>
 				<div class="ip">IP: ${ip}</div>
 				<div class="duration">Duration: ${duration}</div>
