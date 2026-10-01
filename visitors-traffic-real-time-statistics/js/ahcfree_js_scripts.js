@@ -3,6 +3,19 @@
  * Values read from the DB (IP, country, city, browser...) must never be
  * injected into the DOM unescaped.
  */
+// Security: convert an HTML string to plain text WITHOUT executing it.
+// DOMParser builds an inert document (no script execution, no image loads),
+// unlike innerHTML on a live element where <img onerror> would fire.
+function ahcfreeStripHtml(html) {
+	if (html === null || html === undefined) return '';
+	try {
+		var doc = new DOMParser().parseFromString(String(html), 'text/html');
+		return (doc.body && doc.body.textContent) || '';
+	} catch (e) {
+		return String(html).replace(/<[^>]*>/g, '');
+	}
+}
+
 function ahcfreeEscHtml(value) {
 	return String(value === null || value === undefined ? '' : value)
 		.replace(/&/g, '&amp;')
@@ -146,9 +159,7 @@ jQuery(document).ready(function () {
 
 							// Extract clean title from HTML
 							if (row.til_page_title) {
-								var tempDiv = document.createElement('div');
-								tempDiv.innerHTML = row.til_page_title;
-								pageTitle = tempDiv.textContent || tempDiv.innerText || 'Unknown';
+								pageTitle = ahcfreeStripHtml(row.til_page_title) || 'Unknown';
 							}
 
 							// Simple clickable hits with modal trigger
@@ -158,7 +169,7 @@ jQuery(document).ready(function () {
                                     data-toggle="modal" 
                                     data-target="#TrafficStatsModal"
                                     data-post-id="${postId}" 
-                                    data-page-title="${pageTitle.replace(/"/g, '&quot;')}"
+                                    data-page-title="${ahcfreeEscHtml(pageTitle)}"
                                     data-hits="${hits}">
                                 <div class="dashicons ahc-icon">&nbsp;<span style="font-size:14px">${hits.toLocaleString()}</span></div>
                                 
@@ -277,9 +288,7 @@ jQuery(document).ready(function () {
 
 							// Remove HTML tags from title
 							if (cleanTitle && typeof cleanTitle === 'string') {
-								var tempDiv = document.createElement('div');
-								tempDiv.innerHTML = cleanTitle;
-								cleanTitle = tempDiv.textContent || tempDiv.innerText || cleanTitle;
+								cleanTitle = ahcfreeStripHtml(cleanTitle);
 							}
 
 							var innerRowData = [
@@ -304,9 +313,7 @@ jQuery(document).ready(function () {
 
 							// Remove HTML tags from title
 							if (cleanTitle && typeof cleanTitle === 'string') {
-								var tempDiv = document.createElement('div');
-								tempDiv.innerHTML = cleanTitle;
-								cleanTitle = tempDiv.textContent || tempDiv.innerText || cleanTitle;
+								cleanTitle = ahcfreeStripHtml(cleanTitle);
 							}
 
 							var innerRowData = [
@@ -542,9 +549,7 @@ jQuery(document).ready(function () {
 					format: {
 						body: function (data, row, col, node) {
 							// Strip HTML tags and clean text
-							const tempDiv = document.createElement("div");
-							tempDiv.innerHTML = data;
-							let cleanText = tempDiv.textContent || tempDiv.innerText || "";
+							let cleanText = ahcfreeStripHtml(data);
 
 							// Clean up whitespace
 							cleanText = cleanText.replace(/\s+/g, ' ').trim();

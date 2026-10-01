@@ -3,7 +3,7 @@ Contributors: wp-buy, osamaesh
 Tags: visitor, traffic, statistics, stats analytics, hits counter
 Requires at least: 3.0.1
 Tested up to: 7.1
-Stable tag: 8.16
+Stable tag: 8.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,6 +182,10 @@ This plugin supports IPv6; however, PHP must be compiled with IPv6 support enabl
 
 
 == Changelog ==
+
+= 8.17 =
+1. Security hardening (follow-up to the 8.16 X-Real-IP XSS fix): visitor data in the dashboard (IP, country, city, region, browser, page titles) is now escaped with entity double-encoding, so values stored by older versions can no longer be decoded back into HTML. Invalid IP values left in the database by older versions are cleaned up automatically on update.
+2. Security hardening: the dashboard's HTML-to-text helper now uses an inert parser instead of innerHTML, and the IP filter in the Recent Visitors search is escaped before being used in the database query.
 
 = 8.16 =
 1. Security fix: resolved an unauthenticated stored DOM-based Cross-Site Scripting (XSS) vulnerability via the 'X-Real-IP' (and other forwarded-IP) HTTP headers. The visitor IP is now strictly validated as a real IPv4/IPv6 address before it is stored, and all visitor data shown in the IP details popup is escaped before being added to the page.

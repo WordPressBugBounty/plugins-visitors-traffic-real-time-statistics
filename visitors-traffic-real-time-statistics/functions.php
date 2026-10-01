@@ -2897,6 +2897,7 @@ function ahcfree_get_recent_visitors($all, $cnt = true, $start = '', $limit = ''
     }
 
     if ($ip != '') {
+        $ip = esc_sql(is_string($ip) ? $ip : '');
         $cond .= " and vtr_ip_address='" . $ip . "'";
         $cond1 .= " and vtr_ip_address='" . $ip . "'";
     }
@@ -2950,8 +2951,9 @@ function ahcfree_get_recent_visitors($all, $cnt = true, $start = '', $limit = ''
                     $arr[$c]['hit_id'] = $hit->vtr_id;
                     $hit_referer = (parse_url($hit->vtr_referer, PHP_URL_HOST) == $_SERVER['SERVER_NAME']) ? '' : rawurldecode($hit->vtr_referer);
                     $hitip = (!empty($hit->hit_referer) ? '<a href="' . esc_url($hit_referer) . '" target="_blank"><img src="' . esc_url(plugins_url('images/openW.jpg', AHCFREE_PLUGIN_MAIN_FILE)) . '" title="' . esc_attr(ahc_view_referer) . '"></a>' : '');
-                    $raw_ip = (get_option('ahcfree_ahcfree_haships') != '1') ? $hit->vtr_ip_address : ahcfree_haship($hit->vtr_ip_address);
-                    $ip_cell = '<span class="ahcfree-ip-cell" title="' . esc_attr($raw_ip) . '" style="display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">' . esc_html($raw_ip) . '</span>';
+                    $safe_ip = ahcfree_safe_stored_ip($hit->vtr_ip_address);
+                    $raw_ip = (get_option('ahcfree_ahcfree_haships') != '1') ? $safe_ip : ahcfree_haship($safe_ip);
+                    $ip_cell = '<span class="ahcfree-ip-cell" title="' . ahcfree_esc_attr_strict($raw_ip) . '" style="display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">' . ahcfree_esc_html_strict($raw_ip) . '</span>';
                     $arr[$c]['hit_ip_address'] = $ip_cell . "&nbsp;" . $hitip;
                     $img = "";
                     if ($hit->ctr_internet_code != '') {
@@ -2965,30 +2967,30 @@ function ahcfree_get_recent_visitors($all, $cnt = true, $start = '', $limit = ''
                     $arr[$c]['hit_time'] = $hit->vtr_time;
 
                     $arr[$c]['ctr_internet_code'] = $hit->ctr_internet_code;
-                    $arr[$c]['bsr_name'] =  $hit->bsr_name;
-                    $arr[$c]['bsr_icon'] = $hit->bsr_icon;
+                    $arr[$c]['bsr_name'] =  ahcfree_esc_html_strict($hit->bsr_name);
+                    $arr[$c]['bsr_icon'] = ahcfree_esc_html_strict($hit->bsr_icon);
 
                     if (strpos($hit->ahc_region, '}')) {
                         $arr[$c]['ahc_region'] = "-";
                     } else {
-                        $arr[$c]['ahc_region'] = $hit->ahc_region;
+                        $arr[$c]['ahc_region'] = ahcfree_esc_html_strict($hit->ahc_region);
                     }
 
                     if (strpos($hit->ahc_city, 'charset')) {
                         $arr[$c]['ahc_city'] = '-';
                     } else {
-                        $arr[$c]['ahc_city'] =  $hit->ahc_city;
+                        $arr[$c]['ahc_city'] =  ahcfree_esc_html_strict($hit->ahc_city);
                     }
 
-                    $arr[$c]['ctr_name'] = $img . $hit->ctr_name;
-                    $arr[$c]['ctr_name'] .= (!empty($hit->ahc_city)) ? ', ' . $hit->ahc_city : '';
-                    $arr[$c]['ctr_name'] .= (!empty($hit->ahc_region)) ? ', ' . $hit->ahc_region : '';
+                    $arr[$c]['ctr_name'] = $img . ahcfree_esc_html_strict($hit->ctr_name);
+                    $arr[$c]['ctr_name'] .= (!empty($hit->ahc_city)) ? ', ' . ahcfree_esc_html_strict($hit->ahc_city) : '';
+                    $arr[$c]['ctr_name'] .= (!empty($hit->ahc_region)) ? ', ' . ahcfree_esc_html_strict($hit->ahc_region) : '';
 
 
                     $arr[$c]['time'] = $visitDate->format('d M Y @ h:i a');
 
                     if ($all == 1) {
-                        $new[$c]['hit_ip_address'] = $hit->vtr_ip_address;
+                        $new[$c]['hit_ip_address'] = ahcfree_safe_stored_ip($hit->vtr_ip_address);
                         $new[$c]['ctr_name'] = $hit->ctr_name . ", " . $hit->ahc_city . ", " . $hit->ahc_region;
                         $new[$c]['time'] = $visitDate->format('d M Y @ h:i a');
                     }
@@ -3545,7 +3547,7 @@ function ahcfree_get_traffic_by_title($all, $cnt = false, $start = '0', $limit =
                     if ($all == 1)
                         $arr[$c]['til_page_title'] = $r->til_page_title;
                     else
-                        $arr[$c]['til_page_title'] = "<a href='" . get_permalink($r->til_page_id) . "' target='_blank'>" . $r->til_page_title . "</a>";
+                        $arr[$c]['til_page_title'] = "<a href='" . esc_url(get_permalink($r->til_page_id)) . "' target='_blank'>" . ahcfree_esc_html_strict($r->til_page_title) . "</a>";
                     $arr[$c]['til_hits'] = $r->til_hits;
                     $ans = ($total > 0) ? ahcfree_ceil_dec((($r->til_hits / $total) * 100), 2, ".")  : 0;
                     $arr[$c]['percent'] = ahcfree_NumFormat($ans) . '%';
@@ -3802,6 +3804,81 @@ function ahcfree_validate_ip($ip)
     $valid = filter_var($ip, FILTER_VALIDATE_IP);
     return ($valid === false) ? '' : $valid;
 }
+
+/**
+ * Escape a value for an HTML attribute, ALWAYS re-encoding existing entities.
+ * WordPress' esc_attr() uses double_encode = false, so a stored value such as
+ * "&lt;img ...&gt;" would be emitted unchanged and decoded back to markup by
+ * jQuery .data(). This helper prevents that.
+ *
+ * @param mixed $value
+ * @return string
+ */
+function ahcfree_esc_attr_strict($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', true);
+}
+
+/**
+ * Escape a value for HTML text, ALWAYS re-encoding existing entities.
+ *
+ * @param mixed $value
+ * @return string
+ */
+function ahcfree_esc_html_strict($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', true);
+}
+
+/**
+ * Returns a stored visitor IP that is safe to display: a valid IP, an
+ * "UNKNOWN..." placeholder, or a hashed IP. Anything else becomes 'UNKNOWN'.
+ *
+ * @param mixed $ip
+ * @return string
+ */
+function ahcfree_safe_stored_ip($ip)
+{
+    $ip = is_string($ip) ? trim($ip) : '';
+    if ($ip === '') {
+        return 'UNKNOWN';
+    }
+    if (ahcfree_validate_ip($ip) !== '') {
+        return $ip;
+    }
+    if (preg_match('/^UNKNOWN[0-9a-f]*$/i', $ip)) {
+        return $ip;
+    }
+    return 'UNKNOWN';
+}
+
+/**
+ * One-time cleanup: remove rows whose stored IP is not a real IP address
+ * (e.g. XSS payloads injected through forged IP headers before 8.16).
+ *
+ * @return void
+ */
+function ahcfree_cleanup_invalid_ips()
+{
+    if (get_option('ahcfree_invalid_ips_cleaned_817')) {
+        return;
+    }
+    global $wpdb;
+    $regex = '^([0-9A-Fa-f:.]+|UNKNOWN[0-9A-Fa-f]*)$';
+    $tables = array(
+        'ahc_recent_visitors' => 'vtr_ip_address',
+        'ahc_hits'            => 'hit_ip_address',
+    );
+    foreach ($tables as $table => $column) {
+        $exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table));
+        if ($exists !== $table) {
+            continue;
+        }
+        $wpdb->query($wpdb->prepare("DELETE FROM `{$table}` WHERE `{$column}` NOT REGEXP %s", $regex));
+    }
+    update_option('ahcfree_invalid_ips_cleaned_817', 1, false);
+}
+add_action('admin_init', 'ahcfree_cleanup_invalid_ips');
 
 //--------------------------------------------
 /**
@@ -4610,13 +4687,14 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
                 }
 
                 // Process IP address
-                $display_ip = $hit->vtr_ip_address;
+                $safe_ip = ahcfree_safe_stored_ip($hit->vtr_ip_address);
+                $display_ip = $safe_ip;
                 if (get_option('ahcfree_ahcfree_haships') == '1') {
-                    $display_ip = ahcfree_haship($hit->vtr_ip_address);
+                    $display_ip = ahcfree_haship($safe_ip);
                 }
 
                 $arr[$c]['hit_id'] = $hit->vtr_id;
-                $ip_cell = '<span class="ahcfree-ip-cell" title="' . esc_attr($display_ip) . '" style="display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">' . esc_html($display_ip) . '</span>';
+                $ip_cell = '<span class="ahcfree-ip-cell" title="' . ahcfree_esc_attr_strict($display_ip) . '" style="display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">' . ahcfree_esc_html_strict($display_ip) . '</span>';
                 $arr[$c]['hit_ip_address'] = $ip_cell . "&nbsp;" . $hitip;
 
                 // Process country flag
@@ -4630,15 +4708,15 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
                 $arr[$c]['hit_date'] = $hit->vtr_date;
                 $arr[$c]['hit_time'] = $hit->vtr_time;
                 $arr[$c]['ctr_internet_code'] = $hit->ctr_internet_code;
-                $arr[$c]['bsr_name'] = $hit->bsr_name;
-                $arr[$c]['bsr_icon'] = $hit->bsr_icon;
+                $arr[$c]['bsr_name'] = ahcfree_esc_html_strict($hit->bsr_name);
+                $arr[$c]['bsr_icon'] = ahcfree_esc_html_strict($hit->bsr_icon);
 
                 // Process city and region
                 $city = (strpos($hit->ahc_city, 'charset') !== false) ? '-' : $hit->ahc_city;
                 $region = (strpos($hit->ahc_region, '}') !== false) ? '-' : $hit->ahc_region;
 
-                $arr[$c]['ahc_region'] = $region;
-                $arr[$c]['ahc_city'] = $city;
+                $arr[$c]['ahc_region'] = ahcfree_esc_html_strict($region);
+                $arr[$c]['ahc_city'] = ahcfree_esc_html_strict($city);
 
                 // Build location string
                 $location_parts = array();
@@ -4646,7 +4724,7 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
                 if ($city && $city != '-') $location_parts[] = $city;
                 if ($region && $region != '-') $location_parts[] = $region;
 
-                $arr[$c]['ctr_name'] = $img . implode(', ', $location_parts);
+                $arr[$c]['ctr_name'] = $img . ahcfree_esc_html_strict(implode(', ', $location_parts));
                 $arr[$c]['time'] = $visitDate->format('d M Y @ h:i a');
 
                 // Calculate session duration for this IP and date
@@ -4754,14 +4832,14 @@ function ahcfree_get_recent_visitors_with_date_range($all, $cnt = true, $start =
 
                 // Create the day hits button with proper data attributes
                 $arr[$c]['day_hits'] = '<button style="background-color: #4CAF50; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px;" 
-                    data-hitdate="' . esc_attr($hit->vtr_date) . '" 
-                    data-hitipaddress="' . esc_attr($hit->vtr_ip_address) . '" 
-                    data-hitcountry="' . esc_attr(implode(', ', $location_parts)) . '" 
+                    data-hitdate="' . ahcfree_esc_attr_strict($hit->vtr_date) . '" 
+                    data-hitipaddress="' . ahcfree_esc_attr_strict(ahcfree_safe_stored_ip($hit->vtr_ip_address)) . '" 
+                    data-hitcountry="' . ahcfree_esc_attr_strict(implode(', ', $location_parts)) . '" 
                     data-toggle="modal" 
                     data-target="#DayHitsModal">' . intval($hit->day_hits2) . '</button>';
 
                 if ($all == 1) {
-                    $new[$c]['hit_ip_address'] = $hit->vtr_ip_address;
+                    $new[$c]['hit_ip_address'] = ahcfree_safe_stored_ip($hit->vtr_ip_address);
                     $new[$c]['ctr_name'] = implode(', ', $location_parts);
                     $new[$c]['time'] = $visitDate->format('d M Y @ h:i a');
                     $new[$c]['day_hits'] = ($hit->day_hits2 > 0) ? $hit->day_hits2 : '1';
